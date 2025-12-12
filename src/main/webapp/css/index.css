@@ -1,0 +1,189 @@
+:root {
+    --matcha-light: #E8F3E1;
+    --matcha-green: #9BCF8E;
+    --matcha-dark: #3A5F41;
+    --brown-accent: #6A4E23;
+    --white: #ffffff;
+}
+
+.wrapper {
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+body {
+    margin: 0;
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--matcha-light);
+    color: var(--matcha-dark);
+}
+
+/* ============================
+   NAVBAR
+============================ */
+.navbar {
+    width: 97%;
+    background: var(--matcha-dark);
+    color: var(--white);
+
+    /* FLEX LAYOUT */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /* SAFE HEIGHT + NO CLIPPING */
+    padding: 14px 25px;
+    height: auto;
+    line-height: 1.4;
+    overflow: visible;
+}
+
+.logo h2 {
+    margin: 0;
+    padding: 0;
+    line-height: 1.3; /* Prevent clipping */
+}
+
+.navbar .menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: center;
+}
+
+.navbar a {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 1rem;
+
+    /* Fix clipping */
+    line-height: 1.3;
+    padding: 2px 0;
+}
+
+.navbar a:hover {
+    color: var(--matcha-green);
+}
+
+/* ============================
+   HERO
+============================ */
+.hero {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--brown-accent);
+}
+
+.hero p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    margin-bottom: 25px;
+}
+
+.btn-primary {
+    padding: 12px 30px;
+    background: var(--matcha-green);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.btn-primary:hover {
+    background: var(--matcha-dark);
+}
+
+/* ============================
+   FEATURES
+============================ */
+.features {
+    padding: 60px 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.feature-card {
+    background: var(--white);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.feature-card h3 {
+    margin-bottom: 10px;
+    color: var(--brown-accent);
+}
+
+/* ============================
+   FOOTER
+============================ */
+.footer {
+    background: var(--matcha-dark);
+    color: var(--white);
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+    font-size: 0.9rem;
+}
+
+/* ============================
+   RESPONSIVE (TABLETS)
+============================ */
+@media (max-width: 768px) {
+
+    .navbar {
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+        padding: 12px 15px;
+    }
+
+    .navbar .menu {
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .hero {
+        padding: 40px 20px;
+    }
+
+    .btn-primary {
+        padding: 10px 25px;
+    }
+
+    .feature-card {
+        padding: 20px;
+    }
+}
+
+/* ============================
+   SMALL PHONES
+============================ */
+@media (max-width: 480px) {
+
+    .navbar h2 {
+        font-size: 1.2rem;
+    }
+
+    .navbar a {
+        font-size: 0.9rem;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
+}
