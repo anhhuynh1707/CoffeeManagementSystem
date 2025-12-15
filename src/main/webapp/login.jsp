@@ -30,7 +30,6 @@
 	<c:if test="${not empty param.message}">
 	    <div class="success-msg">${param.message}</div>
 	</c:if>
-
     <form action="${pageContext.request.contextPath}/login" method="post">
 
         <div class="form-group">

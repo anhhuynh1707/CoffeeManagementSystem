@@ -286,4 +286,51 @@ public class UserDAO {
         }
         return false;
     }
+    public boolean checkPassword(int userId, String rawPassword) {
+        String sql = "SELECT password FROM users WHERE id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("password").equals(rawPassword);
+                // ⚠️ If hashed → use BCrypt
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public void deleteUserCompletely(int userId) {
+
+        String deleteCart = "DELETE FROM cart_items WHERE user_id = ?";
+        String deleteOrders = "DELETE FROM orders WHERE user_id = ?";
+        String deleteUser = "DELETE FROM users WHERE id = ?";
+
+        try (Connection con = DBConnection.getConnection()) {
+
+            con.setAutoCommit(false); // 🔒 transaction
+
+            try (PreparedStatement ps1 = con.prepareStatement(deleteCart);
+                 PreparedStatement ps2 = con.prepareStatement(deleteOrders);
+                 PreparedStatement ps3 = con.prepareStatement(deleteUser)) {
+
+                ps1.setInt(1, userId);
+                ps1.executeUpdate();
+
+                ps2.setInt(1, userId);
+                ps2.executeUpdate();
+
+                ps3.setInt(1, userId);
+                ps3.executeUpdate();
+
+                con.commit();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
