@@ -135,19 +135,39 @@ public class OrderDAO {
         return null;
     }
     public List<OrderItem> getOrderItems(int orderId) {
+
         List<OrderItem> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM order_items WHERE order_id = ?";
+        String sql = """
+            SELECT 
+                oi.item_id,
+                oi.order_id,
+                oi.product_id,
+                oi.quantity,
+                oi.base_price,
+                oi.extra_price,
+                oi.final_price,
+                oi.milk_type,
+                oi.sugar_level,
+                oi.ice_level,
+                oi.toppings,
+                m.name AS product_name,
+                m.image_url
+            FROM order_items oi
+            JOIN menu m ON oi.product_id = m.id
+            WHERE oi.order_id = ?
+        """;
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, orderId);
-
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 OrderItem item = new OrderItem();
 
+                // existing fields
                 item.setItemId(rs.getInt("item_id"));
                 item.setOrderId(rs.getInt("order_id"));
                 item.setProductId(rs.getInt("product_id"));
@@ -159,6 +179,10 @@ public class OrderDAO {
                 item.setSugarLevel(rs.getString("sugar_level"));
                 item.setIceLevel(rs.getString("ice_level"));
                 item.setToppings(rs.getString("toppings"));
+
+                // 🔥 NEW: product info
+                item.setProductName(rs.getString("product_name"));
+                item.setImageUrl(rs.getString("image_url"));
 
                 list.add(item);
             }

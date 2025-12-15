@@ -9,42 +9,56 @@ import java.util.List;
 
 public class CartDAO {
 
-    // 🔹 Add item OR increase quantity if already exists
-    public void addToCart(int userId, int productId, double basePrice) {
-        String checkSql = "SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?";
-        String insertSql = "INSERT INTO cart_items (user_id, product_id, quantity, base_price, extra_price, final_price) " +
-                           "VALUES (?, ?, 1, ?, 0, ?)";
-        String updateSql = "UPDATE cart_items SET quantity = quantity + 1 WHERE user_id = ? AND product_id = ?";
+    // Add item OR increase quantity if already exists
+	public void addToCart(int userId, int productId, double basePrice, int quantity) {
 
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement checkPs = con.prepareStatement(checkSql)) {
+	    String checkSql = """
+	        SELECT cart_id
+	        FROM cart_items 
+	        WHERE user_id = ? AND product_id = ?
+	    """;
 
-            checkPs.setInt(1, userId);
-            checkPs.setInt(2, productId);
-            ResultSet rs = checkPs.executeQuery();
+	    String insertSql = """
+	        INSERT INTO cart_items 
+	        (user_id, product_id, quantity, base_price, extra_price, final_price)
+	        VALUES (?, ?, ?, ?, 0, ?)
+	    """;
 
-            if (rs.next()) {
-                // item exists → increase quantity
-                try (PreparedStatement ps = con.prepareStatement(updateSql)) {
-                    ps.setInt(1, userId);
-                    ps.setInt(2, productId);
-                    ps.executeUpdate();
-                }
-            } else {
-                // item doesn't exist → insert
-                try (PreparedStatement ps = con.prepareStatement(insertSql)) {
-                    ps.setInt(1, userId);
-                    ps.setInt(2, productId);
-                    ps.setDouble(3, basePrice);
-                    ps.setDouble(4, basePrice);  // final price = basePrice + 0
-                    ps.executeUpdate();
-                }
-            }
+	    String updateSql = """
+	        UPDATE cart_items 
+	        SET quantity = quantity + ?
+	        WHERE cart_id = ?
+	    """;
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement checkPs = con.prepareStatement(checkSql)) {
+
+	        checkPs.setInt(1, userId);
+	        checkPs.setInt(2, productId);
+
+	        ResultSet rs = checkPs.executeQuery();
+
+	        if (rs.next()) {
+	            int cartId = rs.getInt("cart_id");
+	            try (PreparedStatement ps = con.prepareStatement(updateSql)) {
+	                ps.setInt(1, quantity);   // qty selected
+	                ps.setInt(2, cartId);    // correct cart_id
+	                ps.executeUpdate();
+	            }
+	        } else {
+	            try (PreparedStatement ps = con.prepareStatement(insertSql)) {
+	                ps.setInt(1, userId);
+	                ps.setInt(2, productId);
+	                ps.setInt(3, quantity);
+	                ps.setDouble(4, basePrice);
+	                ps.setDouble(5, basePrice);
+	                ps.executeUpdate();
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 
     // 🔹 Get all cart items for a user
     public List<CartItem> getCartByUser(int userId) {
@@ -170,5 +184,21 @@ public class CartDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public int getTotalQuantity(int userId) {
+        String sql = "SELECT SUM(quantity) FROM cart_items WHERE user_id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

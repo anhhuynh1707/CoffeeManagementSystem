@@ -9,6 +9,7 @@ import model.CartItem;
 import model.Menu;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 @WebServlet("/cart")
@@ -30,44 +31,74 @@ public class CartController extends HttpServlet {
         }
 
         String op = request.getParameter("op");
-        String cid = request.getParameter("cid");   // cart_id
-        String pid = request.getParameter("pid");   // product_id
+        String cid = request.getParameter("cid");
+        String pid = request.getParameter("pid");
 
+        /* ========= ADD TO CART ========= */
         if ("add".equals(op) && pid != null) {
+
+            int qty = 1;
+            if (request.getParameter("qty") != null) {
+                qty = Integer.parseInt(request.getParameter("qty"));
+            }
+
             Menu product = menuDAO.getMenuById(Integer.parseInt(pid));
             if (product != null) {
-                cartDAO.addToCart(userId, product.getId(), product.getPrice());
+                cartDAO.addToCart(
+                        userId,
+                        product.getId(),
+                        product.getPrice(),
+                        qty
+                );
             }
-            request.setAttribute("successMsg", "Added to cart successfully!");
+
+            // update cart count immediately
+            int cartCount = cartDAO.getTotalQuantity(userId);
+            session.setAttribute("cartCount", cartCount);
+
+            // stay on menu
+            response.sendRedirect(request.getContextPath() + "/menu");
+            return;
         }
 
+        /* ========= INCREASE ========= */
         if ("inc".equals(op) && cid != null) {
             cartDAO.increase(Integer.parseInt(cid));
         }
 
+        /* ========= DECREASE ========= */
         if ("dec".equals(op) && cid != null) {
             cartDAO.decrease(Integer.parseInt(cid));
         }
 
+        /* ========= REMOVE ========= */
         if ("remove".equals(op) && cid != null) {
             cartDAO.remove(Integer.parseInt(cid));
         }
 
-        // Load updated cart
+        /* ========= LOAD CART ========= */
         List<CartItem> cart = cartDAO.getCartByUser(userId);
 
-        double subtotal = 0;
+        BigDecimal subtotal = BigDecimal.ZERO;
         for (CartItem item : cart) {
-            subtotal += item.getFinalPrice() * item.getQuantity();
+        	BigDecimal price = BigDecimal.valueOf(item.getFinalPrice());
+            BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
+            subtotal = subtotal.add(price.multiply(qty));
         }
 
-        double shipping = subtotal > 0 ? 2.50 : 0;
-        double total = subtotal + shipping;
+        BigDecimal shipping = subtotal.compareTo(BigDecimal.ZERO) > 0
+                ? new BigDecimal("2.50")
+                : BigDecimal.ZERO;
+        BigDecimal total = subtotal.add(shipping);
 
         request.setAttribute("cartItems", cart);
         request.setAttribute("subtotal", subtotal);
         request.setAttribute("shipping", shipping);
         request.setAttribute("total", total);
+
+        // update cart count
+        int cartCount = cartDAO.getTotalQuantity(userId);
+        session.setAttribute("cartCount", cartCount);
 
         request.getRequestDispatcher("/cart.jsp").forward(request, response);
     }
