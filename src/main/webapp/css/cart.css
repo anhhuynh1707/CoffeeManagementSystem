@@ -282,3 +282,39 @@ h1 {
 .empty p {
 	font-size: 1.2rem;
 }
+.option-group {
+    margin-top: 10px;
+}
+
+.option-group .label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.toggle-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.toggle-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--matcha-dark);
+    background: white;
+    color: var(--matcha-dark);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+    background: var(--matcha-light);
+}
+
+.toggle-btn.active {
+    background: var(--matcha-dark);
+    color: white;
+}

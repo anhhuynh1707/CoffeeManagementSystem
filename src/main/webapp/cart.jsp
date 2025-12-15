@@ -13,6 +13,7 @@
 	rel="stylesheet">
 <link rel="stylesheet" href="css/cart.css">
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/cart-options.js"></script>
 </head>
 
 <body>
@@ -79,11 +80,65 @@
 					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}"
 					class="cart-img" alt="${item.productName}">
 
-				<!-- INFO -->
 				<div class="item-info">
 					<h3>${item.productName}</h3>
 					<div class="item-price">$${item.finalPrice}</div>
+
+					<!-- CUSTOM OPTIONS -->
+					<form class="options-form"
+					      action="${pageContext.request.contextPath}/cart"
+					      method="post">
+					
+					    <input type="hidden" name="op" value="updateOptions">
+					    <input type="hidden" name="cid" value="${item.cartId}">
+					    <input type="hidden" name="milk"  value="${item.milkType}">
+					    <input type="hidden" name="sugar" value="${item.sugarLevel}">
+					    <input type="hidden" name="ice"   value="${item.iceLevel}">
+					
+					    <!-- MILK -->
+					    <div class="option-group">
+					        <span class="label">Milk</span>
+					        <div class="toggle-group" data-name="milk">
+					            <button type="button" data-value="Fresh Milk"
+					                class="toggle-btn ${item.milkType == 'Fresh Milk' ? 'active' : ''}">
+					                Fresh
+					            </button>
+					            <button type="button" data-value="Oatside"
+					                class="toggle-btn ${item.milkType == 'Oatside' ? 'active' : ''}">
+					                Oatside
+					            </button>
+					            <button type="button" data-value="Cream Milk"
+					                class="toggle-btn ${item.milkType == 'Cream Milk' ? 'active' : ''}">
+					                Cream
+					            </button>
+					        </div>
+					    </div>
+					
+					    <!-- SUGAR -->
+					    <div class="option-group">
+					        <span class="label">Sugar</span>
+					        <div class="toggle-group" data-name="sugar">
+					            <button type="button" data-value="100%" class="toggle-btn ${item.sugarLevel == '100%' ? 'active' : ''}">100%</button>
+					            <button type="button" data-value="70%"  class="toggle-btn ${item.sugarLevel == '70%'  ? 'active' : ''}">70%</button>
+					            <button type="button" data-value="50%"  class="toggle-btn ${item.sugarLevel == '50%'  ? 'active' : ''}">50%</button>
+					            <button type="button" data-value="0%"   class="toggle-btn ${item.sugarLevel == '0%'   ? 'active' : ''}">0%</button>
+					        </div>
+					    </div>
+					
+					    <!-- ICE -->
+					    <div class="option-group">
+					        <span class="label">Ice</span>
+					        <div class="toggle-group" data-name="ice">
+					            <button type="button" data-value="100%" class="toggle-btn ${item.iceLevel == '100%' ? 'active' : ''}">100%</button>
+					            <button type="button" data-value="70%"  class="toggle-btn ${item.iceLevel == '70%'  ? 'active' : ''}">70%</button>
+					            <button type="button" data-value="50%"  class="toggle-btn ${item.iceLevel == '50%'  ? 'active' : ''}">50%</button>
+					            <button type="button" data-value="0%"   class="toggle-btn ${item.iceLevel == '0%'   ? 'active' : ''}">0%</button>
+					        </div>
+					    </div>
+					
+					</form>
 				</div>
+
 
 				<!-- ACTIONS -->
 				<div class="item-actions">

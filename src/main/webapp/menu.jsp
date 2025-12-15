@@ -59,17 +59,26 @@
 
 	<!-- CATEGORY FILTER -->
 	<div class="filter-bar">
-		<form action="${pageContext.request.contextPath}/menu" method="get">
-			<select name="category" onchange="this.form.submit()">
-				<option value="all" ${param.category == 'all' ? 'selected' : ''}>All</option>
-				<option value="coffee"
-					${param.category == 'coffee' ? 'selected' : ''}>Coffee</option>
-				<option value="matcha"
-					${param.category == 'matcha' ? 'selected' : ''}>Matcha</option>
-				<option value="tea" ${param.category == 'tea' ? 'selected' : ''}>Tea</option>
-				<option value="bakery"
-					${param.category == 'bakery' ? 'selected' : ''}>Bakery</option>
-			</select>
+    <form id="categoryForm"
+          action="${pageContext.request.contextPath}/menu"
+          method="get">
+
+        <input type="hidden" name="category" id="categoryInput"
+               value="${param.category != null ? param.category : 'all'}">
+
+			<div class="custom-select" id="customSelect">
+				<div class="select-selected" id="selectedOption">All</div>
+
+				<div class="select-items">
+					<div data-value="all">All</div>
+					<div data-value="coffee">Coffee</div>
+					<div data-value="matcha">Matcha</div>
+					<div data-value="tea">Tea</div>
+					<div data-value="milk tea">Milk Tea</div>
+					<div data-value="bakery">Bakery</div>
+				</div>
+			</div>
+
 		</form>
 	</div>
 

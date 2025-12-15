@@ -164,7 +164,7 @@
 		        soft music, and a calming green aesthetic.
 		    </p>
 		    <p>
-		        Our shop is designed for slow moments — where you can
+		        Our shop is designed for slow moments - where you can
 		        sip mindfully and enjoy the art of tea and coffee.
 		    </p>
 		</section>

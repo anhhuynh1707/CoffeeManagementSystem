@@ -226,10 +226,17 @@ section p {
     border-radius: 14px;
     margin-bottom: 12px;
 }
+.about {
+    max-width: 1100px;
+    margin: 80px auto;
+    padding: 0 20px;
+}
+
 .about-flex {
     display: flex;
-    gap: 30px;
+    gap: 50px;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
@@ -237,6 +244,15 @@ section p {
     width: 100%;
     max-width: 420px;
     border-radius: 18px;
+}
+
+.about-flex > div {
+    max-width: 520px;
+}
+
+.about h2,
+.about p {
+    text-align: left;
 }
 .experience-bg {
     background:

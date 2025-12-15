@@ -73,7 +73,7 @@ public class OrderController extends HttpServlet {
             return;
         }
 
-        // Get payment method (COD, VNPAY, CARD)
+        // Get payment method (COD, VietQR, CARD)
         String paymentMethod = request.getParameter("paymentMethod");
 
         if (paymentMethod == null || paymentMethod.isEmpty()) {
