@@ -73,10 +73,11 @@
 
 		<form action="checkout" method="post">
 
-			<label class="payment-option"> <input type="radio"
-				name="paymentMethod" value="COD" checked> Cash on Delivery
-				(COD)
-			</label> <label class="payment-option"> <label><input
+			<label class="payment-option">
+				<input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery(COD)
+			</label>
+			<label class="payment-option"> <label>
+			<input
 					type="radio" name="paymentMethod" value="VIETQR"> </label> VietQR -
 				Pay with QR code
 			</label> <label class="payment-option"> <input type="radio"

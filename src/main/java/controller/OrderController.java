@@ -142,7 +142,7 @@ public class OrderController extends HttpServlet {
 
             case "CARD" -> {
                 // Redirect to card payment controller
-                response.sendRedirect("card-payment?orderId=" + orderId);
+                response.sendRedirect("card-payment.jsp?orderId=" + orderId);
             }
 
             default -> {
