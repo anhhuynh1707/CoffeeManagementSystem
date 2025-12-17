@@ -7,6 +7,7 @@ public class CartItem {
 	private int productId;
 
 	private int quantity;
+	private String category;
 	private double basePrice;
 	private double extraPrice;
 	private double finalPrice;
@@ -45,7 +46,14 @@ public class CartItem {
 	public void setProductId(int productId) {
 		this.productId = productId;
 	}
-
+	
+	public String getCategory() {
+	    return category;
+	}
+	public void setCategory(String category) {
+	    this.category = category;
+	}
+	
 	public int getQuantity() {
 		return quantity;
 	}

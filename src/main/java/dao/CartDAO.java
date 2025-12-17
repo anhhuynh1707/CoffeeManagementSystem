@@ -94,7 +94,8 @@ public class CartDAO {
 				    c.toppings,
 				    m.name,
 				    m.image_url,
-				    m.price
+				    m.price,
+				    m.category
 				FROM cart_items c
 				JOIN menu m ON c.product_id = m.id
 				WHERE c.user_id = ?
@@ -124,7 +125,7 @@ public class CartDAO {
 
 				item.setProductName(rs.getString("name"));
 				item.setImageUrl(rs.getString("image_url"));
-
+				item.setCategory(rs.getString("category"));
 				list.add(item);
 			}
 
@@ -221,6 +222,10 @@ public class CartDAO {
 			extraPrice = 0.5;
 		} else if ("Cream Milk".equals(milk)) {
 			extraPrice = 0.7;
+		}
+		else if ("No milk".equals(milk) || milk == null) {
+		    milk = null; // normalize
+		    extraPrice = 0;
 		}
 		// Fresh Milk → +0
 		String sql = """
