@@ -43,7 +43,7 @@ public class UserDAO {
 
     // Login
     public User login(String email) {
-        String sql = "SELECT * FROM users WHERE email = ? AND status='active'";
+        String sql = "SELECT * FROM users WHERE email = ?";
 
         Connection conn = null;
         PreparedStatement stmt = null;

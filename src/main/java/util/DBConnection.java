@@ -6,11 +6,11 @@ public class DBConnection {
 
     private static final String URL = "jdbc:mysql://localhost:3306/coffee_management";
     private static final String USER = "root";
-    private static final String PASSWORD = "123456";
-
+    private static final String PASSWORD = "1234";
+    
     static {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver"); // Load MySQL driver
+            Class.forName("com.mysql.cj.jdbc.Driver"); // Load MySQL driver	
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
