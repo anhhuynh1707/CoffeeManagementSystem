@@ -50,6 +50,26 @@ body {
 .user-name {
 	font-weight: 500;
 }
+/* WEATHER */
+.weather-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: white;
+}
+.weather-greet {
+    color: #e8f5e9;
+    font-style: italic;
+}
+.weather-icon {
+    font-size: 20px;
+}
+.separator {
+    margin: 0 8px;
+    opacity: 0.6;
+    font-weight: bold;
+}
 /* CART */
 .cart-btn {
 	position: relative;
