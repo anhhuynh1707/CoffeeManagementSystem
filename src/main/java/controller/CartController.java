@@ -25,11 +25,6 @@ public class CartController extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
-        if (userId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         String op = request.getParameter("op");
 
         if ("updateOptions".equals(op)) {

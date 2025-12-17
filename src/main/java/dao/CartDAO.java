@@ -223,8 +223,7 @@ public class CartDAO {
 		} else if ("Cream Milk".equals(milk)) {
 			extraPrice = 0.7;
 		}
-		else if ("No milk".equals(milk) || milk == null) {
-		    milk = null; // normalize
+		else if ("No milk".equals(milk)) {
 		    extraPrice = 0;
 		}
 		// Fresh Milk → +0

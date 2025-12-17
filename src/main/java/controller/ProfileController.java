@@ -19,12 +19,6 @@ public class ProfileController extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        // If user is not logged in → redirect to login page
-        if (session == null || session.getAttribute("userId") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         // Get user ID from session
         int userId = (int) session.getAttribute("userId");
 

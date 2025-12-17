@@ -14,15 +14,6 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        // Get current session
-        HttpSession session = request.getSession(false);
-        
-        if (session != null) {
-            // Invalidate session
-            session.invalidate();
-        }
-        
         // Redirect to login page with message
         response.sendRedirect("login?message=You have been logged out successfully");
     }

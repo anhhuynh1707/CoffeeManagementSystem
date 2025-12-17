@@ -21,11 +21,6 @@ public class AdminDashboardController extends HttpServlet {
 
         HttpSession session = req.getSession(false);
 
-        if (session == null || session.getAttribute("currentUser") == null) {
-            resp.sendRedirect("login.jsp");
-            return;
-        }
-
         String role = (String) session.getAttribute("role");
         if (!"admin".equalsIgnoreCase(role)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied.");

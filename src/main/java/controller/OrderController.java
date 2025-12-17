@@ -24,11 +24,6 @@ public class OrderController extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
-        if (userId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         List<CartItem> cart = cartDAO.getCartByUser(userId);
 
         if (cart.isEmpty()) {

@@ -22,12 +22,6 @@ public class DeleteAccountController extends HttpServlet {
             throws IOException, ServletException {
 
         HttpSession session = request.getSession(false);
-
-        if (session == null || session.getAttribute("currentUser") == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         User currentUser = (User) session.getAttribute("currentUser");
         String password = request.getParameter("password");
 
