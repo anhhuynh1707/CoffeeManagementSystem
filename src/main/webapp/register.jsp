@@ -59,7 +59,7 @@
         </div>
 
         <div class="form-footer">
-            <a href="login.jsp">Already have an account? Login</a>
+            <a href="login">Already have an account? Login</a>
         </div>
 
     </form>

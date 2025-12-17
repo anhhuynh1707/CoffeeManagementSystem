@@ -35,7 +35,7 @@
 			</div>
 
 			<div class="form-footer">
-				<a href="login.jsp">Back to login</a>
+				<a href="login">Back to login</a>
 			</div>
 
 		</form>
