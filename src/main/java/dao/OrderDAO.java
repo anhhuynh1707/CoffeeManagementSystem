@@ -233,4 +233,80 @@ public class OrderDAO {
 
         return list;
     }
+    public int createOrderFromCart(
+            int userId,
+            List<CartItem> cartItems,
+            String paymentMethod,
+            String paymentStatus
+    ) {
+
+        int orderId = -1;
+
+        try (Connection con = DBConnection.getConnection()) {
+
+            con.setAutoCommit(false); // 🔒 transaction
+
+            // 1️⃣ Calculate totals
+            double subtotal = 0;
+            int totalCups = 0;
+
+            for (CartItem c : cartItems) {
+                subtotal += c.getFinalPrice() * c.getQuantity();
+                totalCups += c.getQuantity();
+            }
+
+            double shipping = subtotal > 0 ? 2.50 : 0;
+            double total = subtotal + shipping;
+
+            // 2️⃣ Create Order object
+            Order order = new Order();
+            order.setUserId(userId);
+            order.setSubtotal(subtotal);
+            order.setShippingFee(shipping);
+            order.setTotalAmount(total);
+            order.setTotalCups(totalCups);
+            order.setStatus("CONFIRMED");
+            order.setPaymentMethod(paymentMethod);
+            order.setPaymentStatus(paymentStatus);
+
+            // 3️⃣ Save order
+            orderId = saveOrder(order);
+
+            if (orderId == -1) {
+                con.rollback();
+                return -1;
+            }
+
+            // 4️⃣ Move cart → order_items
+            moveCartToOrderItems(orderId, cartItems);
+
+            con.commit(); // ✅ success
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orderId;
+    }
+    public boolean confirmCardPayment(int orderId) {
+
+        String sql = """
+            UPDATE orders
+            SET payment_status = 'PAID',
+                status = 'confirmed',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE order_id = ?
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

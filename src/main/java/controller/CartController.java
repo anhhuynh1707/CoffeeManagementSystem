@@ -17,7 +17,29 @@ public class CartController extends HttpServlet {
 
     private CartDAO cartDAO = new CartDAO();
     private MenuDAO menuDAO = new MenuDAO();
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
 
+        HttpSession session = request.getSession();
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        String op = request.getParameter("op");
+
+        if ("updateOptions".equals(op)) {
+
+            int cartId = Integer.parseInt(request.getParameter("cid"));
+            String milk = request.getParameter("milk");
+            String sugar = request.getParameter("sugar");
+            String ice = request.getParameter("ice");
+
+            cartDAO.updateOptions(cartId, userId, milk, sugar, ice);
+        }
+
+        response.sendRedirect(request.getContextPath() + "/cart");
+    }
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -38,17 +60,39 @@ public class CartController extends HttpServlet {
         if ("add".equals(op) && pid != null) {
 
             int qty = 1;
+
+            // ✅ DEFAULT OPTIONS
+            String milk = "Fresh Milk";
+            String sugar = "70%";
+            String ice = "100%";
+            String toppings = ""; // optional
+
             if (request.getParameter("qty") != null) {
                 qty = Integer.parseInt(request.getParameter("qty"));
             }
 
             Menu product = menuDAO.getMenuById(Integer.parseInt(pid));
             if (product != null) {
+
+                double basePrice = product.getPrice();
+                double extraPrice = 0;
+
+                // (optional future logic)
+                // if ("Oatside".equals(milk)) extraPrice = 0.5;
+
+                double finalPrice = basePrice + extraPrice;
+
                 cartDAO.addToCart(
                         userId,
                         product.getId(),
-                        product.getPrice(),
-                        qty
+                        qty,
+                        basePrice,
+                        extraPrice,
+                        finalPrice,
+                        milk,
+                        sugar,
+                        ice,
+                        toppings
                 );
             }
 

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,6 +14,8 @@
 	rel="stylesheet">
 <link rel="stylesheet" href="css/cart.css">
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/cart-options.js"></script>
+<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
 <body>
@@ -24,6 +27,23 @@
 			class="logo-link"> Matcha Coffee ☕ </a>
 
 		<!-- RIGHT: ACTIONS -->
+		<div class="weather-box" id="weatherBox">
+		    <span class="weather-icon" id="weatherIcon">⛅</span>
+		    <span class="weather-text" id="weatherText">Loading...</span>
+		    <span class="separator">|</span>
+		    <span class="weather-greet"> How do you feel today,
+		        <strong>
+		            <c:choose>
+		                <c:when test="${not empty sessionScope.currentUser}">
+		                    ${sessionScope.currentUser.fullName}
+		                </c:when>
+		                <c:otherwise>
+		                    Guest
+		                </c:otherwise>
+		            </c:choose>
+		        </strong>?
+		    </span>
+		</div>
 		<div class="nav-actions">
 			<!-- USER -->
 			<div class="user-menu" id="userMenu">
@@ -72,6 +92,8 @@
 
 		<!-- CART ITEMS -->
 		<c:forEach var="item" items="${cartItems}">
+		<c:set var="isBakery" value="${item.category == 'Bakery'}" />
+		
 			<div class="cart-item">
 
 				<!-- IMAGE -->
@@ -79,52 +101,122 @@
 					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}"
 					class="cart-img" alt="${item.productName}">
 
-				<!-- INFO -->
 				<div class="item-info">
 					<h3>${item.productName}</h3>
 					<div class="item-price">$${item.finalPrice}</div>
+
+					<!-- CUSTOM OPTIONS -->
+					<c:if test="${!isBakery}">
+						<form class="options-form"
+							action="${pageContext.request.contextPath}/cart" method="post">
+
+
+							<input type="hidden" name="op" value="updateOptions"> <input
+								type="hidden" name="cid" value="${item.cartId}"> <input
+								type="hidden" name="milk" value="${item.milkType}"> <input
+								type="hidden" name="sugar" value="${item.sugarLevel}"> <input
+								type="hidden" name="ice" value="${item.iceLevel}">
+
+							<!-- MILK -->
+							<div class="option-group">
+							    <span class="label">Milk</span>
+							    <div class="toggle-group" data-name="milk">
+							
+							        <!-- NO MILK -->
+							        <button type="button" data-value="No milk"
+							            class="toggle-btn ${item.milkType == 'No milk' || empty item.milkType ? 'active' : ''}">
+							            No milk
+							        </button>
+							
+							        <button type="button" data-value="Fresh Milk"
+							            class="toggle-btn ${item.milkType == 'Fresh Milk' ? 'active' : ''}">
+							            Fresh
+							        </button>
+							
+							        <button type="button" data-value="Oatside"
+							            class="toggle-btn ${item.milkType == 'Oatside' ? 'active' : ''}">
+							            Oatside
+							        </button>
+							
+							        <button type="button" data-value="Cream Milk"
+							            class="toggle-btn ${item.milkType == 'Cream Milk' ? 'active' : ''}">
+							            Cream
+							        </button>
+							
+							    </div>
+							</div>
+
+
+							<!-- SUGAR -->
+							<div class="option-group">
+								<span class="label">Sugar</span>
+								<div class="toggle-group" data-name="sugar">
+									<button type="button" data-value="100%"
+										class="toggle-btn ${item.sugarLevel == '100%' ? 'active' : ''}">100%</button>
+									<button type="button" data-value="70%"
+										class="toggle-btn ${item.sugarLevel == '70%'  ? 'active' : ''}">70%</button>
+									<button type="button" data-value="50%"
+										class="toggle-btn ${item.sugarLevel == '50%'  ? 'active' : ''}">50%</button>
+									<button type="button" data-value="0%"
+										class="toggle-btn ${item.sugarLevel == '0%'   ? 'active' : ''}">0%</button>
+								</div>
+							</div>
+
+							<!-- ICE -->
+							<div class="option-group">
+								<span class="label">Ice</span>
+								<div class="toggle-group" data-name="ice">
+									<button type="button" data-value="100%"
+										class="toggle-btn ${item.iceLevel == '100%' ? 'active' : ''}">100%</button>
+									<button type="button" data-value="70%"
+										class="toggle-btn ${item.iceLevel == '70%'  ? 'active' : ''}">70%</button>
+									<button type="button" data-value="50%"
+										class="toggle-btn ${item.iceLevel == '50%'  ? 'active' : ''}">50%</button>
+									<button type="button" data-value="0%"
+										class="toggle-btn ${item.iceLevel == '0%'   ? 'active' : ''}">0%</button>
+								</div>
+							</div>
+
+						</form>
+						</c:if>
 				</div>
 
 				<!-- ACTIONS -->
 				<div class="item-actions">
-
 					<div class="quantity-box">
 						<a href="cart?op=dec&cid=${item.cartId}" class="qty-btn">−</a> <span
 							class="qty-display">${item.quantity}</span> <a
 							href="cart?op=inc&cid=${item.cartId}" class="qty-btn">+</a>
 					</div>
-
 					<a href="cart?op=remove&cid=${item.cartId}" class="remove-btn">
 						Remove </a>
 				</div>
-
 			</div>
 		</c:forEach>
-
 		<!-- SUMMARY -->
 		<c:if test="${not empty cartItems}">
 			<div class="summary">
 				<h2>Order Summary</h2>
 
 				<div class="summary-row">
-					<span>Subtotal</span> <span>$${subtotal}</span>
+					<span>Subtotal</span>
+					<span>$${subtotal}</span>
 				</div>
 				<div class="summary-row">
-					<span>Shipping Fee</span> <span>$${shipping}</span>
+					<span>Shipping Fee</span>
+					<span>$${shipping}</span>
 				</div>
 
 				<div class="summary-row summary-total">
-					<span>Total</span> <span>$${total}</span>
+					<span>Total</span>
+					<span>$${total}</span>
 				</div>
-
 				<a href="${pageContext.request.contextPath}/checkout"
 					class="btn-primary"> Proceed to Checkout </a> <a
 					href="${pageContext.request.contextPath}/menu"
 					class="btn-secondary"> Continue Shopping </a>
 			</div>
 		</c:if>
-
 	</div>
-
 </body>
 </html>

@@ -1,0 +1,105 @@
+:root {
+    --matcha-light: #E8F3E1;
+    --matcha-green: #9BCF8E;
+    --matcha-dark: #3A5F41;
+    --brown-accent: #6A4E23;
+    --white: #ffffff;
+    --danger: #d84a4a;
+}
+
+body {
+    margin: 0;
+    font-family: "Noto Sans JP", sans-serif;
+    background: var(--matcha-light);
+    color: var(--matcha-dark);
+}
+
+/* PAYMENT CARD */
+.payment-card {
+    max-width: 460px;
+    margin: 80px auto;
+    background: var(--white);
+    padding: 35px 30px;
+    border-radius: 22px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    text-align: center;
+}
+
+/* TITLE */
+.payment-card h2 {
+    margin-bottom: 10px;
+    color: var(--brown-accent);
+}
+
+.payment-card p {
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+/* FORM */
+.form-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.form-row {
+    display: flex;
+    gap: 40px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 95%;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: var(--matcha-green);
+    box-shadow: 0 0 0 2px rgba(155, 207, 142, 0.25);
+}
+
+/* BUTTONS */
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--matcha-green);
+    color: white;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--matcha-dark);
+}
+
+.btn-secondary {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--matcha-dark);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* ERROR */
+.error-msg {
+    background: #fdecea;
+    color: var(--danger);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}

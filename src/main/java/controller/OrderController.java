@@ -24,11 +24,6 @@ public class OrderController extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
-        if (userId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         List<CartItem> cart = cartDAO.getCartByUser(userId);
 
         if (cart.isEmpty()) {
@@ -73,7 +68,7 @@ public class OrderController extends HttpServlet {
             return;
         }
 
-        // Get payment method (COD, VNPAY, CARD)
+        // Get payment method (COD, VietQR, CARD)
         String paymentMethod = request.getParameter("paymentMethod");
 
         if (paymentMethod == null || paymentMethod.isEmpty()) {
@@ -142,7 +137,7 @@ public class OrderController extends HttpServlet {
 
             case "CARD" -> {
                 // Redirect to card payment controller
-                response.sendRedirect("card-payment?orderId=" + orderId);
+                response.sendRedirect("card-payment.jsp?orderId=" + orderId);
             }
 
             default -> {

@@ -12,6 +12,7 @@
 	rel="stylesheet">
 <link rel="stylesheet" href="css/my-orders.css">
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
 <body>
@@ -22,6 +23,23 @@
 			class="logo-link"> Matcha Coffee ☕ </a>
 
 		<!-- RIGHT: ACTIONS -->
+		<div class="weather-box" id="weatherBox">
+		    <span class="weather-icon" id="weatherIcon">⛅</span>
+		    <span class="weather-text" id="weatherText">Loading...</span>
+		    <span class="separator">|</span>
+		    <span class="weather-greet"> How do you feel today,
+		        <strong>
+		            <c:choose>
+		                <c:when test="${not empty sessionScope.currentUser}">
+		                    ${sessionScope.currentUser.fullName}
+		                </c:when>
+		                <c:otherwise>
+		                    Guest
+		                </c:otherwise>
+		            </c:choose>
+		        </strong>?
+		    </span>
+		</div>
 		<div class="nav-actions">
 			<!-- USER -->
 			<div class="user-menu" id="userMenu">

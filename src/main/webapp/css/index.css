@@ -50,6 +50,26 @@ body {
 .user-name {
 	font-weight: 500;
 }
+/* WEATHER */
+.weather-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: white;
+}
+.weather-greet {
+    color: #e8f5e9;
+    font-style: italic;
+}
+.weather-icon {
+    font-size: 20px;
+}
+.separator {
+    margin: 0 8px;
+    opacity: 0.6;
+    font-weight: bold;
+}
 /* CART */
 .cart-btn {
 	position: relative;
@@ -226,10 +246,17 @@ section p {
     border-radius: 14px;
     margin-bottom: 12px;
 }
+.about {
+    max-width: 1100px;
+    margin: 80px auto;
+    padding: 0 20px;
+}
+
 .about-flex {
     display: flex;
-    gap: 30px;
+    gap: 50px;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
@@ -237,6 +264,15 @@ section p {
     width: 100%;
     max-width: 420px;
     border-radius: 18px;
+}
+
+.about-flex > div {
+    max-width: 520px;
+}
+
+.about h2,
+.about p {
+    text-align: left;
 }
 .experience-bg {
     background:

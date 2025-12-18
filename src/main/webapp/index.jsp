@@ -12,6 +12,7 @@
 	rel="stylesheet">
 <link rel="stylesheet" href="css/index.css">
 <script src="${pageContext.request.contextPath}/js/main.js"></script>
+<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
 <body>
@@ -23,30 +24,84 @@
 			class="logo-link"> Matcha Coffee ☕ </a>
 
 		<!-- RIGHT: ACTIONS -->
+		<div class="weather-box" id="weatherBox">
+		    <span class="weather-icon" id="weatherIcon">⛅</span>
+		    <span class="weather-text" id="weatherText">Loading...</span>
+		    <span class="separator">|</span>
+		    <span class="weather-greet"> How do you feel today,
+		        <strong>
+		            <c:choose>
+		                <c:when test="${not empty sessionScope.currentUser}">
+		                    ${sessionScope.currentUser.fullName}
+		                </c:when>
+		                <c:otherwise>
+		                    Guest
+		                </c:otherwise>
+		            </c:choose>
+		        </strong>?
+		    </span>
+		</div>
 		<div class="nav-actions">
 			<!-- USER -->
 			<div class="user-menu" id="userMenu">
 				<span class="user-name"> 👤
-					${sessionScope.currentUser.fullName} </span>
+					<c:choose>
+                    <c:when test="${not empty sessionScope.currentUser}">
+                        ${sessionScope.currentUser.fullName}
+                    </c:when>
+                    <c:otherwise>
+                        Guest
+                    </c:otherwise>
+                </c:choose>
+            </span>
 
-				<div class="dropdown" id="dropdownMenu">
-					<a href="${pageContext.request.contextPath}/menu">Menu</a> <a
-						href="${pageContext.request.contextPath}/profile">Profile</a> <a
-						href="${pageContext.request.contextPath}/my-orders">Orders</a>
-					<hr>
-					<a href="${pageContext.request.contextPath}/logout" class="logout">
-						Logout </a>
-				</div>
-				<!-- CART -->
-				<a href="${pageContext.request.contextPath}/cart" class="cart-btn">
-					🛒 <c:if test="${sessionScope.cartCount > 0}">
-						<span class="cart-badge">${sessionScope.cartCount}</span>
-					</c:if>
-				</a>
-			</div>
+            <div class="dropdown" id="dropdownMenu">
 
-		</div>
-	</div>
+                <!-- 🔓 NOT LOGGED IN -->
+                <c:if test="${empty sessionScope.userId}">
+                    <a href="${pageContext.request.contextPath}/login">Login</a>
+                    <a href="${pageContext.request.contextPath}/register">Register</a>
+                </c:if>
+
+                <!-- 🔒 LOGGED IN -->
+                <c:if test="${not empty sessionScope.userId}">
+                    <a href="${pageContext.request.contextPath}/menu">Menu</a>
+                    <a href="${pageContext.request.contextPath}/profile">Profile</a>
+                    <a href="${pageContext.request.contextPath}/my-orders">Orders</a>
+
+                    <c:if test="${sessionScope.role == 'admin'}">
+                        <hr>
+                        <a href="${pageContext.request.contextPath}/dashboard">
+                            🛠 Admin Dashboard
+                        </a>
+                    </c:if>
+
+                    <hr>
+                    <a href="${pageContext.request.contextPath}/logout"
+                       class="logout">
+                        Logout
+                    </a>
+                </c:if>
+
+            </div>
+
+            <!-- CART (ONLY WHEN LOGGED IN) -->
+            <c:if test="${not empty sessionScope.userId}">
+                <a href="${pageContext.request.contextPath}/cart"
+                   class="cart-btn">
+                    🛒
+                    <c:if test="${sessionScope.cartCount > 0}">
+                        <span class="cart-badge">
+                            ${sessionScope.cartCount}
+                        </span>
+                    </c:if>
+                </a>
+            </c:if>
+
+        </div>
+
+    </div>
+</div>
 
 	<!-- HERO SECTION -->
 	<div class="wrapper">
@@ -164,7 +219,7 @@
 		        soft music, and a calming green aesthetic.
 		    </p>
 		    <p>
-		        Our shop is designed for slow moments — where you can
+		        Our shop is designed for slow moments - where you can
 		        sip mindfully and enjoy the art of tea and coffee.
 		    </p>
 		</section>
