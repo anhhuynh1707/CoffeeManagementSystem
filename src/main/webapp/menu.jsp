@@ -134,7 +134,7 @@
 				<img
 					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}">
 				<h3>${item.name}</h3>
-				<div class="price">$${item.price}</div>
+				<div class="price">${item.price} VND</div>
 
 				<form action="${pageContext.request.contextPath}/cart" method="get">
 					<input type="hidden" name="op" value="add"> <input

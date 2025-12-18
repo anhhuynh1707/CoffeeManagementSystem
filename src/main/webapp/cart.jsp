@@ -197,20 +197,33 @@
 		<c:if test="${not empty cartItems}">
 			<div class="summary">
 				<h2>Order Summary</h2>
-
 				<div class="summary-row">
-					<span>Subtotal</span>
-					<span>$${subtotal}</span>
+				    <span>Subtotal</span>
+				    <span>${subtotal} VND</span>
 				</div>
+				
 				<div class="summary-row">
-					<span>Shipping Fee</span>
-					<span>$${shipping}</span>
+				    <span>Shipping Fee</span>
+				    <span>
+				        <c:choose>
+				            <c:when test="${not empty shipping}">
+				                ${shipping} VND
+				            </c:when>
+				            <c:otherwise>
+				                Calculated at checkout
+				            </c:otherwise>
+				        </c:choose>
+				    </span>
 				</div>
-
+				
 				<div class="summary-row summary-total">
-					<span>Total</span>
-					<span>$${total}</span>
+				    <span>Total</span>
+				    <span>${total} VND</span>
 				</div>
+				
+				<p class="shipping-note">
+				    * Shipping fee is estimated based on your delivery district.
+				</p>
 				<a href="${pageContext.request.contextPath}/checkout"
 					class="btn-primary"> Proceed to Checkout </a> <a
 					href="${pageContext.request.contextPath}/menu"

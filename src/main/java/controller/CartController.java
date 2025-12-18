@@ -7,6 +7,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.CartItem;
 import model.Menu;
+import model.User;
+import service.ShippingService;
+import util.AddressUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -130,10 +133,22 @@ public class CartController extends HttpServlet {
             subtotal = subtotal.add(price.multiply(qty));
         }
 
-        BigDecimal shipping = subtotal.compareTo(BigDecimal.ZERO) > 0
-                ? new BigDecimal("2.50")
-                : BigDecimal.ZERO;
-        BigDecimal total = subtotal.add(shipping);
+
+        ShippingService shippingService = new ShippingService();
+
+	    // get user address (single string)
+        User currentUser = (User) session.getAttribute("currentUser");
+        String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	    // OR: currentUser.getAddress()
+	    String district = AddressUtil.extractDistrict(fullAddress);
+	    // fixed city for now
+	    String city = "Ho Chi Minh City";
+	
+	    BigDecimal shipping = subtotal.compareTo(BigDecimal.ZERO) > 0
+	            ? shippingService.calculateShipping(city, district)
+	            : BigDecimal.ZERO;
+	
+	    BigDecimal total = subtotal.add(shipping);
 
         request.setAttribute("cartItems", cart);
         request.setAttribute("subtotal", subtotal);

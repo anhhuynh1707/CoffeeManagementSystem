@@ -50,9 +50,19 @@
         </div>
 
         <div class="form-group">
-            <label>Address</label>
-            <input type="text" name="address" class="form-control" placeholder="Enter address">
-        </div>
+		    <label>Address</label>
+		    <input
+		        type="text"
+		        name="address"
+		        class="form-control"
+		        placeholder="Street name, District (e.g. 123 Le Van Viet, Thu Duc)"
+		        required
+		    >
+		    <small class="form-text text-muted">
+		        <strong>Note: </strong>To ensure accurate shipping fee calculation, the address input explicitly requires district information.
+		        The system uses the district value to determine zone-based shipping fees
+		    </small>
+		</div>
 
         <div class="btn-container">
             <button type="submit" class="btn-login">Register</button>

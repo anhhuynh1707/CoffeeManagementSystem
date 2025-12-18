@@ -86,7 +86,7 @@
 						Total Cups: <b>${o.totalCups}</b>
 					</p>
 					<p>
-						Total Amount: <b>$${o.totalAmount}</b>
+						Total Amount: <b>${o.totalAmount} VND</b>
 					</p>
 					<p>
 						Payment Method: <b>${o.paymentMethod}</b>

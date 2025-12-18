@@ -55,17 +55,25 @@
 
 		<!-- ORDER SUMMARY -->
 		<div class="summary-box">
-			<div class="summary-row">
-				<span>Subtotal</span> <span>$${subtotal}</span>
-			</div>
 
-			<div class="summary-row">
-				<span>Shipping Fee</span> <span>$${shipping}</span>
-			</div>
-
-			<div class="summary-row summary-total">
-				<span>Total</span> <span>$${total}</span>
-			</div>
+		    <div class="summary-row">
+		        <span>Subtotal</span>
+		        <span>${subtotal} VND</span>
+		    </div>
+		
+		    <div class="summary-row">
+		        <span>Shipping Fee</span>
+		        <span>${shipping} VND</span>
+		    </div>
+		
+		    <div class="summary-row summary-total">
+		        <span>Total</span>
+		        <span>${total} VND</span>
+		    </div>
+		
+		    <p class="note">
+		        Shipping fee is calculated based on your delivery district.
+		    </p>
 		</div>
 
 		<!-- PAYMENT METHODS -->

@@ -6,6 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.CartItem;
 import model.Order;
+import model.User;
+import service.ShippingService;
+import util.AddressUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,8 +42,20 @@ public class OrderController extends HttpServlet {
             cups += item.getQuantity();
         }
 
-        double shipping = 2.50;
-        double total = subtotal + shipping;
+        ShippingService shippingService = new ShippingService();
+
+	    // get address from currentUser (NOT session string)
+	    User currentUser = (User) session.getAttribute("currentUser");
+	    String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	
+	    String district = AddressUtil.extractDistrict(fullAddress);
+	    String city = "Ho Chi Minh City";
+	
+	    double shipping = shippingService
+	            .calculateShipping(city, district)
+	            .doubleValue();
+	
+	    double total = subtotal + shipping;
 
         // Pass data to page
         request.setAttribute("cart", cart);
@@ -92,8 +107,20 @@ public class OrderController extends HttpServlet {
             cups += item.getQuantity();
         }
 
-        double shipping = 2.50;
-        double total = subtotal + shipping;
+        ShippingService shippingService = new ShippingService();
+
+	    // user has only ONE address string
+        User currentUser = (User) session.getAttribute("currentUser");
+        String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	    String district = AddressUtil.extractDistrict(fullAddress);
+		// city fixed for now
+	    String city = "Ho Chi Minh City";
+	
+	    // FINAL shipping fee
+	    double shipping = shippingService
+	            .calculateShipping(city, district)
+	            .doubleValue();
+	    double total = subtotal + shipping;
 
         // Create new order object
         Order order = new Order();

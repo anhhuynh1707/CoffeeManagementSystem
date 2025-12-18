@@ -45,14 +45,18 @@
 						</div></td>
 
 					<td>${item.quantity}</td>
-					<td>$${item.finalPrice}</td>
+					<td>${item.finalPrice} VND</td>
 				</tr>
 			</c:forEach>
 		</table>
 
 		<div class="total-box">
-			Subtotal: $${order.subtotal}<br> Shipping: $${order.shippingFee}<br>
-			Total: <span style="color: var(--matcha-dark);">$${order.totalAmount}</span>
+		    Subtotal: ${order.subtotal} VND<br>
+		    Shipping: ${order.shippingFee} VND<br>
+		    Total:
+		    <span style="color: var(--matcha-dark);">
+		        ${order.totalAmount} VND
+		    </span>
 		</div>
 
 		<!-- ACTION BUTTONS -->
