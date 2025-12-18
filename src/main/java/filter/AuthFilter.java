@@ -26,7 +26,9 @@ public class AuthFilter implements Filter {
             "/register",
             "/register.jsp",
             "/forgot-password",
-            "/forgot-password.jsp"
+            "/forgot-password.jsp",
+            "/reset-password",
+            "/reset-password.jsp"
     );
 
     @Override
