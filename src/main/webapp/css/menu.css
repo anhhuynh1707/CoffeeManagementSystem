@@ -164,8 +164,11 @@ body {
 ========================= */
 .filter-bar {
     display: flex;
+    align-items: center;
     justify-content: center;
+    gap: 18px;
     margin: 30px 0 40px;
+    flex-wrap: wrap; /* responsive */
 }
 
 .custom-select {
@@ -231,6 +234,43 @@ body {
 
 .select-items div:hover {
     background: var(--matcha-light);
+}
+.search-sort-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.search-sort-form input[type="text"],
+.search-sort-form select {
+    padding: 10px 16px;
+    border-radius: 14px;
+    border: 2px solid var(--matcha-dark);
+    font-weight: 500;
+    outline: none;
+}
+
+.search-sort-form input[type="text"] {
+    width: 200px;
+    height: 24px;
+}
+
+.search-sort-form select {
+    cursor: pointer;
+}
+.search-sort-form button {
+    padding: 10px 18px;
+    border-radius: 14px;
+    border: none;
+    background: var(--matcha-dark);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.search-sort-form button:hover {
+    background: var(--matcha-green);
 }
 /* MENU GRID */
 .menu-grid {

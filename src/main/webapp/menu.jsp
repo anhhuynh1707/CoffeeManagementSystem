@@ -27,21 +27,19 @@
 
 		<!-- RIGHT: ACTIONS -->
 		<div class="weather-box" id="weatherBox">
-		    <span class="weather-icon" id="weatherIcon">⛅</span>
-		    <span class="weather-text" id="weatherText">Loading...</span>
-		    <span class="separator">|</span>
-		    <span class="weather-greet"> How do you feel today,
-		        <strong>
-		            <c:choose>
-		                <c:when test="${not empty sessionScope.currentUser}">
+			<span class="weather-icon" id="weatherIcon">⛅</span> <span
+				class="weather-text" id="weatherText">Loading...</span> <span
+				class="separator">|</span> <span class="weather-greet"> How
+				do you feel today, <strong> <c:choose>
+						<c:when test="${not empty sessionScope.currentUser}">
 		                    ${sessionScope.currentUser.fullName}
 		                </c:when>
-		                <c:otherwise>
+						<c:otherwise>
 		                    Guest
 		                </c:otherwise>
-		            </c:choose>
-		        </strong>?
-		    </span>
+					</c:choose>
+			</strong>?
+			</span>
 		</div>
 		<div class="nav-actions">
 			<!-- USER -->
@@ -77,16 +75,17 @@
 
 	<!-- CATEGORY FILTER -->
 	<div class="filter-bar">
-    <form id="categoryForm"
-          action="${pageContext.request.contextPath}/menu"
-          method="get">
-
-        <input type="hidden" name="category" id="categoryInput"
-               value="${param.category != null ? param.category : 'all'}">
-
+		<!-- CATEGORY FORM (JS controlled) -->
+		<form id="categoryForm"
+			action="${pageContext.request.contextPath}/menu" method="get">
+			<input type="hidden" name="category" id="categoryInput"
+				value="${param.category != null ? param.category : 'all'}">
+			<!-- preserve search & sort -->
+			<input type="hidden" name="q" id="qInput" value="${param.q}">
+			<input type="hidden" name="sort" id="categorySortInput"
+				value="${param.sort}">
 			<div class="custom-select" id="customSelect">
 				<div class="select-selected" id="selectedOption">All</div>
-
 				<div class="select-items">
 					<div data-value="all">All</div>
 					<div data-value="coffee">Coffee</div>
@@ -96,7 +95,34 @@
 					<div data-value="bakery">Bakery</div>
 				</div>
 			</div>
+		</form>
+		<!-- SEARCH + SORT FORM -->
+		<form action="${pageContext.request.contextPath}/menu" method="get"
+			class="search-sort-form">
 
+			<!-- preserve category -->
+			<input type="hidden" name="category"
+				value="${param.category != null ? param.category : 'all'}">
+
+			<!-- search -->
+			<input type="text" name="q" placeholder="Search menu..."
+				value="${param.q}">
+
+			<!-- sort -->
+			<input type="hidden" name="sort" id="sortInput"
+				value="${param.sort != null ? param.sort : ''}">
+
+			<!-- CUSTOM SORT DROPDOWN -->
+			<div class="custom-select" id="sortSelect">
+				<div class="select-selected" id="sortSelected">Newest</div>
+
+				<div class="select-items">
+					<div data-value="">Newest</div>
+					<div data-value="price_asc">Price ↑</div>
+					<div data-value="price_desc">Price ↓</div>
+				</div>
+			</div>
+			<button type="submit">Search</button>
 		</form>
 	</div>
 

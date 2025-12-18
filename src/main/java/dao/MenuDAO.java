@@ -10,31 +10,49 @@ import java.util.List;
 public class MenuDAO {
 
     // Get all items (including category, image, price)
-	public List<Menu> getMenuByCategory(String category) {
+	public List<Menu> getMenu(String category, String keyword, String sort) {
 
 	    List<Menu> list = new ArrayList<>();
 
-	    String sql;
+	    StringBuilder sql = new StringBuilder(
+	        "SELECT * FROM menu WHERE status = 'available'"
+	    );
 
-	    if (category == null || category.equals("all")) {
-	        sql = "SELECT * FROM menu WHERE status = 'available' ORDER BY created_at DESC";
+	    // Filter by category
+	    if (category != null && !category.equals("all")) {
+	        sql.append(" AND category = ?");
+	    }
+
+	    // Search by name
+	    if (keyword != null && !keyword.trim().isEmpty()) {
+	        sql.append(" AND LOWER(name) LIKE ?");
+	    }
+
+	    // Sort by price
+	    if ("price_asc".equals(sort)) {
+	        sql.append(" ORDER BY price ASC");
+	    } else if ("price_desc".equals(sort)) {
+	        sql.append(" ORDER BY price DESC");
 	    } else {
-	        sql = "SELECT * FROM menu WHERE status = 'available' AND category = ? ORDER BY created_at DESC";
+	        sql.append(" ORDER BY created_at DESC");
 	    }
 
 	    try (Connection con = DBConnection.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
+	         PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-	        // If category is applied, set parameter
+	        int index = 1;
+
 	        if (category != null && !category.equals("all")) {
-	            ps.setString(1, category);
+	            ps.setString(index++, category);
+	        }
+
+	        if (keyword != null && !keyword.trim().isEmpty()) {
+	            ps.setString(index++, "%" + keyword.toLowerCase() + "%");
 	        }
 
 	        try (ResultSet rs = ps.executeQuery()) {
-
 	            while (rs.next()) {
 	                Menu item = new Menu();
-
 	                item.setId(rs.getInt("id"));
 	                item.setName(rs.getString("name"));
 	                item.setDescription(rs.getString("description"));

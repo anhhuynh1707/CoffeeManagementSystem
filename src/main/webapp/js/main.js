@@ -28,13 +28,32 @@ function decreaseQty(btn) {
 }
 document.addEventListener("DOMContentLoaded", () => {
 
-    const select = document.getElementById("customSelect");
-    const selected = document.getElementById("selectedOption");
-    const items = select.querySelector(".select-items");
-    const input = document.getElementById("categoryInput");
-    const form = document.getElementById("categoryForm");
+    /* =========================
+       CATEGORY DROPDOWN
+    ========================= */
+    const categorySelect = document.getElementById("customSelect");
+    const categorySelected = document.getElementById("selectedOption");
+    const categoryItems = categorySelect.querySelector(".select-items");
 
-    const labels = {
+    const categoryInput = document.getElementById("categoryInput");
+    const qInput = document.getElementById("qInput");
+
+    // 🔥 IMPORTANT: correct sort input for CATEGORY form
+    const categorySortInput = document.getElementById("categorySortInput");
+
+    const categoryForm = document.getElementById("categoryForm");
+
+    /* =========================
+       SORT DROPDOWN
+    ========================= */
+    const sortSelect = document.getElementById("sortSelect");
+    const sortSelected = document.getElementById("sortSelected");
+    const sortItems = sortSelect.querySelector(".select-items");
+
+    // 🔥 correct sort input for SEARCH form
+    const sortInput = document.getElementById("sortInput");
+
+    const categoryLabels = {
         all: "All",
         coffee: "Coffee",
         matcha: "Matcha",
@@ -43,31 +62,72 @@ document.addEventListener("DOMContentLoaded", () => {
         bakery: "Bakery"
     };
 
+    const sortLabels = {
+        "": "Newest",
+        price_asc: "Price ↑",
+        price_desc: "Price ↓"
+    };
+
     const urlParams = new URLSearchParams(window.location.search);
+
     const currentCategory = urlParams.get("category") || "all";
+    const currentQ = urlParams.get("q") || "";
+    const currentSort = urlParams.get("sort") || "";
 
-    selected.textContent = labels[currentCategory] || "All";
-    input.value = currentCategory;
+    /* =========================
+       INIT VALUES
+    ========================= */
+    categorySelected.textContent = categoryLabels[currentCategory] || "All";
+    categoryInput.value = currentCategory;
+    qInput.value = currentQ;
+    categorySortInput.value = currentSort;
 
-    // Toggle dropdown
-    selected.addEventListener("click", (e) => {
+    sortSelected.textContent = sortLabels[currentSort] || "Newest";
+    sortInput.value = currentSort;
+
+    /* =========================
+       CATEGORY EVENTS
+    ========================= */
+    categorySelected.addEventListener("click", (e) => {
         e.stopPropagation();
-        select.classList.toggle("open");
+        categorySelect.classList.toggle("open");
+        sortSelect.classList.remove("open");
     });
 
-    // Select item
-    items.querySelectorAll("div").forEach(option => {
+    categoryItems.querySelectorAll("div").forEach(option => {
         option.addEventListener("click", () => {
-            selected.textContent = option.textContent;
-            input.value = option.dataset.value;
-            select.classList.remove("open");
+            categorySelected.textContent = option.textContent;
+            categoryInput.value = option.dataset.value;
+            categorySelect.classList.remove("open");
 
-            setTimeout(() => form.submit(), 150);
+            categoryForm.submit(); // ✅ keeps q & sort
         });
     });
 
-    // Close when clicking outside
+    /* =========================
+       SORT EVENTS
+    ========================= */
+    sortSelected.addEventListener("click", (e) => {
+        e.stopPropagation();
+        sortSelect.classList.toggle("open");
+        categorySelect.classList.remove("open");
+    });
+
+    sortItems.querySelectorAll("div").forEach(option => {
+        option.addEventListener("click", () => {
+            sortSelected.textContent = option.textContent;
+            sortInput.value = option.dataset.value;
+            sortSelect.classList.remove("open");
+
+            sortSelect.closest("form").submit();
+        });
+    });
+
+    /* =========================
+       CLOSE ON OUTSIDE CLICK
+    ========================= */
     document.addEventListener("click", () => {
-        select.classList.remove("open");
+        categorySelect.classList.remove("open");
+        sortSelect.classList.remove("open");
     });
 });
