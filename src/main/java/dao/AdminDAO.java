@@ -27,7 +27,7 @@ public class AdminDAO {
 
     // ---- TOTAL USERS ----
     public int getTotalUsers() {
-        String sql = "SELECT COUNT(*) - 1 FROM users"; // Minus 1 for administrator
+        String sql = "SELECT COUNT (*) FROM users WHERE role = 'customer'"; //count all the users except admins
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
