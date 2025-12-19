@@ -103,7 +103,7 @@
 
 				<div class="item-info">
 					<h3>${item.productName}</h3>
-					<div class="item-price">$${item.finalPrice}</div>
+					<div class="item-price">${item.finalPrice} VND</div>
 
 					<!-- CUSTOM OPTIONS -->
 					<c:if test="${!isBakery}">

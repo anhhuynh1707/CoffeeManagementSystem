@@ -29,6 +29,10 @@
 			<a href="order-details?id=${orderId}" class="btn-primary">View
 				Order</a>
 			<a href="menu" class="btn-secondary">Back to Menu</a>
+			<a href="${pageContext.request.contextPath}/shipping?orderId=${param.orderId}"
+			   class="btn-primary">
+			    Track Your Order
+			</a>
 		</c:if>
 
 		<!-- FAILED STATE -->

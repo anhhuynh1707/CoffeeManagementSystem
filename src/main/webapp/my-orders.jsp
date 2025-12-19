@@ -107,8 +107,10 @@
 					</c:choose>
 				</div>
 
-				<a href="order-details?id=${o.id}" class="btn-view">View Details</a>
-
+				<a href="${pageContext.request.contextPath}/shipping?orderId=${o.id}"
+				   class="btn-view">
+				    Track Order
+				</a>
 			</div>
 		</c:forEach>
 	</div>

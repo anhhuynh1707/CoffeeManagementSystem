@@ -2,10 +2,12 @@ package controller;
 
 import dao.CartDAO;
 import dao.OrderDAO;
+import dao.ShippingDAO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.CartItem;
 import model.Order;
+import model.Shipping;
 import model.User;
 import service.ShippingService;
 import util.AddressUtil;
@@ -142,6 +144,21 @@ public class OrderController extends HttpServlet {
 
         // Save order → returns orderId
         int orderId = orderDAO.saveOrder(order);
+        // 🔥🔥 ADD THIS BLOCK (SHIPPING SNAPSHOT) 🔥🔥
+        Shipping shippingObj = new Shipping();
+        shippingObj.setOrderId(orderId);
+        shippingObj.setReceiverName(currentUser.getFullName());
+        shippingObj.setPhone(currentUser.getPhone());
+        shippingObj.setAddress(currentUser.getAddress());
+        shippingObj.setCity(city);
+        shippingObj.setDistrict(district);
+        shippingObj.setWard(""); // optional
+        shippingObj.setShippingFee(shipping);
+        shippingObj.setMethod("standard");
+        shippingObj.setStatus("pending");
+
+        ShippingDAO shippingDAO = new ShippingDAO();
+        shippingDAO.createShipping(shippingObj);
 
         // Move cart → order_items
         orderDAO.moveCartToOrderItems(orderId, cart);
