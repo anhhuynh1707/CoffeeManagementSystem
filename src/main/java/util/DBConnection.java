@@ -45,4 +45,16 @@ public class DBConnection {
 	            e.printStackTrace();
 	    }
 	}
+	
+	//Test connection
+	/* 
+	public static void main(String[] args) {
+	    try (Connection con = getConnection()) {
+	        System.out.println("✅ Database connected successfully!");
+	    } catch (Exception e) {
+	        System.out.println("❌ Database connection failed!");
+	        e.printStackTrace();
+	    }
+	}*/
+
 }
