@@ -179,5 +179,30 @@ public class MenuDAO {
 			return false;
 		}
 	}
+	
+	public void updateProductTextOnly(Menu product) {
+	    String sql = """
+	        UPDATE menu
+	        SET name = ?, description = ?, category = ?, price = ?, status = ?
+	        WHERE id = ?
+	    """;
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setString(1, product.getName());
+	        ps.setString(2, product.getDescription());
+	        ps.setString(3, product.getCategory());
+	        ps.setDouble(4, product.getPrice());
+	        ps.setString(5, product.getStatus());
+	        ps.setInt(6, product.getId());
+
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
 
 }
