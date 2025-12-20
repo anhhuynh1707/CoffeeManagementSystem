@@ -203,6 +203,22 @@ public class MenuDAO {
 	        e.printStackTrace();
 	    }
 	}
+	
+	public boolean deleteProductById(int id) {
+	    String sql = "DELETE FROM menu WHERE id = ?";
+
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+	        return ps.executeUpdate() == 1;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
 
 
 }

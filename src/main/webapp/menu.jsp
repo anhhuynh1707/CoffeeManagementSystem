@@ -132,7 +132,7 @@
 		<c:forEach var="item" items="${menuList}">
 			<div class="item-card">
 				<img
-					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}">
+					src="${pageContext.request.contextPath}/uploads/menu/${item.imageUrl}">
 				<h3>${item.name}</h3>
 				<div class="price">$${item.price}</div>
 

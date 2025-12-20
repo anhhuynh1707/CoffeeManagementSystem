@@ -24,12 +24,21 @@ public class AdminProductsController extends HttpServlet {
 	// ======================
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	        throws ServletException, IOException {
 
-		List<Menu> products = menuDAO.getAllProductsForAdmin();
+	    String op = request.getParameter("op");
 
-		request.setAttribute("products", products);
-		request.getRequestDispatcher("/admin-products.jsp").forward(request, response);
+	    if ("remove".equals(op)) {
+	        int id = Integer.parseInt(request.getParameter("id"));
+	        menuDAO.deleteProductById(id);
+	        response.sendRedirect("products");
+	        return;
+	    }
+
+	    // default: show list
+	    List<Menu> products = menuDAO.getAllProductsForAdmin();
+	    request.setAttribute("products", products);
+	    request.getRequestDispatcher("/admin-products.jsp").forward(request, response);
 	}
 
 	// ======================
@@ -44,10 +53,9 @@ public class AdminProductsController extends HttpServlet {
 	        response.sendRedirect("products");
 	        return;
 	    }
-
-	    // ============ ADD (with image upload) ============
-	    if ("add".equals(op)) {
-
+	    
+	    switch(op) {
+	    case "add": {
 	        String name = request.getParameter("name");
 	        String description = request.getParameter("description");
 	        String category = request.getParameter("category");
@@ -77,48 +85,46 @@ public class AdminProductsController extends HttpServlet {
 	        response.sendRedirect("products");
 	        return;
 	    }
+	    case "update":{
+	    	 int id;
+		        try {
+		            id = Integer.parseInt(request.getParameter("id"));
+		        } catch (Exception e) {
+		            response.sendRedirect("products");
+		            return;
+		        }
 
-	    // ============ UPDATE (text-only, keep image_url) ============
-	    if ("update".equals(op)) {
+		        String name = request.getParameter("name");
+		        String description = request.getParameter("description");
+		        String category = request.getParameter("category");
+		        String status = request.getParameter("status");
 
-	        int id;
-	        try {
-	            id = Integer.parseInt(request.getParameter("id"));
-	        } catch (Exception e) {
-	            response.sendRedirect("products");
-	            return;
-	        }
+		        double price;
+		        try {
+		            price = Double.parseDouble(request.getParameter("price"));
+		        } catch (Exception e) {
+		            response.sendRedirect("products");
+		            return;
+		        }
 
-	        String name = request.getParameter("name");
-	        String description = request.getParameter("description");
-	        String category = request.getParameter("category");
-	        String status = request.getParameter("status");
+		        Menu product = new Menu();
+		        product.setId(id);
+		        product.setName(name);
+		        product.setDescription(description);
+		        product.setCategory(category);
+		        product.setStatus(status);
+		        product.setPrice(price);
 
-	        double price;
-	        try {
-	            price = Double.parseDouble(request.getParameter("price"));
-	        } catch (Exception e) {
-	            response.sendRedirect("products");
-	            return;
-	        }
+		        menuDAO.updateProductTextOnly(product);
 
-	        Menu product = new Menu();
-	        product.setId(id);
-	        product.setName(name);
-	        product.setDescription(description);
-	        product.setCategory(category);
-	        product.setStatus(status);
-	        product.setPrice(price);
-
-	        menuDAO.updateProductTextOnly(product);
-
-	        response.sendRedirect("products");
-	        return;
+		        response.sendRedirect("products");
+		        return;
 	    }
-
-	    response.sendRedirect("products");
+	    default:
+		    response.sendRedirect("products");	
+	    	
+	    }
 	}
-
 
 	private String getUploadDir() {
 		String dir = getServletContext().getInitParameter("uploadDir");
