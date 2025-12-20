@@ -1,44 +1,41 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>My Orders | Matcha Coffee</title>
 
-<link
-	href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="css/my-orders.css">
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/js/weather.js"></script>
+<head>
+	<meta charset="UTF-8">
+	<title>My Orders | Matcha Coffee</title>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="css/my-orders.css">
+	<script src="${pageContext.request.contextPath}/js/main.js"></script>
+	<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
 <body>
-<div class="navbar">
+	<div class="navbar">
 
 		<!-- LEFT: LOGO -->
-		<a href="${pageContext.request.contextPath}/index.jsp"
-			class="logo-link"> Matcha Coffee ☕ </a>
+		<a href="${pageContext.request.contextPath}/index.jsp" class="logo-link"> Matcha Coffee ☕ </a>
 
 		<!-- RIGHT: ACTIONS -->
 		<div class="weather-box" id="weatherBox">
-		    <span class="weather-icon" id="weatherIcon">⛅</span>
-		    <span class="weather-text" id="weatherText">Loading...</span>
-		    <span class="separator">|</span>
-		    <span class="weather-greet"> How do you feel today,
-		        <strong>
-		            <c:choose>
-		                <c:when test="${not empty sessionScope.currentUser}">
-		                    ${sessionScope.currentUser.fullName}
-		                </c:when>
-		                <c:otherwise>
-		                    Guest
-		                </c:otherwise>
-		            </c:choose>
-		        </strong>?
-		    </span>
+			<span class="weather-icon" id="weatherIcon">⛅</span>
+			<span class="weather-text" id="weatherText">Loading...</span>
+			<span class="separator">|</span>
+			<span class="weather-greet"> How do you feel today,
+				<strong>
+					<c:choose>
+						<c:when test="${not empty sessionScope.currentUser}">
+							${sessionScope.currentUser.fullName}
+						</c:when>
+						<c:otherwise>
+							Guest
+						</c:otherwise>
+					</c:choose>
+				</strong>?
+			</span>
 		</div>
 		<div class="nav-actions">
 			<!-- USER -->
@@ -47,30 +44,25 @@
 					${sessionScope.currentUser.fullName} </span>
 
 				<div class="dropdown" id="dropdownMenu">
-					<a href="${pageContext.request.contextPath}/menu">Menu</a> <a
-						href="${pageContext.request.contextPath}/profile">Profile</a> <a
-						href="${pageContext.request.contextPath}/my-orders">Orders</a>
+					<a href="${pageContext.request.contextPath}/menu">Menu</a>
+					<a href="${pageContext.request.contextPath}/profile">Profile</a>
+					<a href="${pageContext.request.contextPath}/my-orders">Orders</a>
 					<hr>
-					<a href="${pageContext.request.contextPath}/logout" class="logout">
-						Logout </a>
+					<a href="${pageContext.request.contextPath}/logout" class="logout">Logout </a>
 				</div>
 				<!-- CART -->
-				<a href="${pageContext.request.contextPath}/cart" class="cart-btn">
-					🛒 <c:if test="${sessionScope.cartCount > 0}">
+				<a href="${pageContext.request.contextPath}/cart" class="cart-btn"> 🛒
+					<c:if test="${sessionScope.cartCount > 0}">
 						<span class="cart-badge">${sessionScope.cartCount}</span>
 					</c:if>
 				</a>
 			</div>
-
 		</div>
 	</div>
-
 	<div class="wrapper">
 		<h1>Your Orders 🍃</h1>
-
 		<c:if test="${empty orders}">
-			<p
-				style="text-align: center; color: var(--matcha-dark); font-weight: bold;">
+			<p style="text-align: center; color: var(--matcha-dark); font-weight: bold;">
 				You have no orders yet.</p>
 		</c:if>
 
@@ -83,10 +75,14 @@
 
 				<div class="order-details">
 					<p>
-						Total Cups: <b>${o.totalCups}</b>
+						Total Cups:
+						<b>${o.totalCups}</b>
 					</p>
 					<p>
-						Total Amount: <b>$${o.totalAmount}</b>
+						Total Amount:
+						<b>
+							<fmt:formatNumber value="${o.totalAmount}" groupingUsed="true" maxFractionDigits="0" /> VND
+						</b>
 					</p>
 					<p>
 						Payment Method: <b>${o.paymentMethod}</b>
@@ -106,12 +102,10 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-
 				<a href="order-details?id=${o.id}" class="btn-view">View Details</a>
-
+				<a href="${pageContext.request.contextPath}/shipping?orderId=${o.id}" class="btn-view">Track Order </a>
 			</div>
 		</c:forEach>
 	</div>
-
 </body>
 </html>

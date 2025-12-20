@@ -216,16 +216,21 @@ public class CartDAO {
 	}
 
 	public void updateOptions(int cartId, int userId, String milk, String sugar, String ice) {
+		// 🥐 Bakery item → ignore updates
+		if (milk == null) {
+		    return;
+		}
 		double extraPrice = 0;
 		// 🧮 PRICE RULES (milk affects price)
 		if ("Oatside".equals(milk)) {
-			extraPrice = 0.5;
+			extraPrice = 5000;
 		} else if ("Cream Milk".equals(milk)) {
-			extraPrice = 0.7;
+			extraPrice = 7000;
 		}
 		else if ("No milk".equals(milk)) {
 		    extraPrice = 0;
 		}
+		
 		// Fresh Milk → +0
 		String sql = """
 				UPDATE cart_items

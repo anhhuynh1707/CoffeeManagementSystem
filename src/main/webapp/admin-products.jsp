@@ -373,6 +373,35 @@
     .back-home:active {
       transform: scale(0.98);
     }
+    
+    .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 900;
+}
+
+.icon-danger {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.icon-danger:hover {
+  background: #a93226;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+    
   </style>
 </head>
 
@@ -444,7 +473,6 @@
     <div class="card" style="overflow:hidden;">
       <div style="padding:18px 22px;">
         <h2 style="margin-bottom:6px;">Product List</h2>
-        <div class="muted">Tip: Search by category or status to filter products.</div>
       </div>
 
       <table>
@@ -512,6 +540,11 @@
                 >
                   ${p.status == 'available' ? 'Disable' : 'Enable'}
                 </a>
+                
+                <!-- Remove (Trash Icon) -->
+                <a class="btn btn-danger" href="products?op=remove&id=${p.id}&page=${page}&q=${param.q}&category=${param.category}&status=${param.status}&sortBy=${sortBy}&sortDir=${sortDir}" onclick="return confirm('Remove this product?');" title="Remove">
+  🗑 </a>
+
               </div>
             </td>
           </tr>
@@ -535,15 +568,10 @@
               ← Prev
             </a>
           </c:if>
-
           <c:if test="${page < totalPages}">
-            <a
-              class="btn btn-secondary"
-              href="products?page=${page-1}&q=${param.q}&category=${param.category}&status=${param.status}&sortBy=${sortBy}&sortDir=${sortDir}"
-            >
-              Next →
-            </a>
+          <a class="btn btn-secondary" href="products?page=${page+1}&q=${param.q}&category=${param.category}&status=${param.status}&sortBy=${sortBy}&sortDir=${sortDir}"> Next →</a>
           </c:if>
+
         </div>
       </div>
     </div>

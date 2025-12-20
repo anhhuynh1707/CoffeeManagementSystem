@@ -2,10 +2,15 @@ package controller;
 
 import dao.CartDAO;
 import dao.OrderDAO;
+import dao.ShippingDAO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.CartItem;
 import model.Order;
+import model.Shipping;
+import model.User;
+import service.ShippingService;
+import util.AddressUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,8 +44,20 @@ public class OrderController extends HttpServlet {
             cups += item.getQuantity();
         }
 
-        double shipping = 2.50;
-        double total = subtotal + shipping;
+        ShippingService shippingService = new ShippingService();
+
+	    // get address from currentUser (NOT session string)
+	    User currentUser = (User) session.getAttribute("currentUser");
+	    String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	
+	    String district = AddressUtil.extractDistrict(fullAddress);
+	    String city = "Ho Chi Minh City";
+	
+	    double shipping = shippingService
+	            .calculateShipping(city, district)
+	            .doubleValue();
+	
+	    double total = subtotal + shipping;
 
         // Pass data to page
         request.setAttribute("cart", cart);
@@ -61,12 +78,6 @@ public class OrderController extends HttpServlet {
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
-
-        // Must be logged in
-        if (userId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
 
         // Get payment method (COD, VietQR, CARD)
         String paymentMethod = request.getParameter("paymentMethod");
@@ -92,8 +103,20 @@ public class OrderController extends HttpServlet {
             cups += item.getQuantity();
         }
 
-        double shipping = 2.50;
-        double total = subtotal + shipping;
+        ShippingService shippingService = new ShippingService();
+
+	    // user has only ONE address string
+        User currentUser = (User) session.getAttribute("currentUser");
+        String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	    String district = AddressUtil.extractDistrict(fullAddress);
+		// city fixed for now
+	    String city = "Ho Chi Minh City";
+	
+	    // FINAL shipping fee
+	    double shipping = shippingService
+	            .calculateShipping(city, district)
+	            .doubleValue();
+	    double total = subtotal + shipping;
 
         // Create new order object
         Order order = new Order();
@@ -116,30 +139,38 @@ public class OrderController extends HttpServlet {
         // Save order → returns orderId
         int orderId = orderDAO.saveOrder(order);
 
-        // Move cart → order_items
+        // Move cart → order_items (ONLY HERE)
         orderDAO.moveCartToOrderItems(orderId, cart);
+        
+        // 🔥🔥 ADD THIS BLOCK (SHIPPING SNAPSHOT) 🔥🔥
+        Shipping shippingObj = new Shipping();
+        shippingObj.setOrderId(orderId);
+        shippingObj.setReceiverName(currentUser.getFullName());
+        shippingObj.setPhone(currentUser.getPhone());
+        shippingObj.setAddress(currentUser.getAddress());
+        shippingObj.setCity(city);
+        shippingObj.setDistrict(district);
+        shippingObj.setWard(""); // optional
+        shippingObj.setShippingFee(shipping);
+        shippingObj.setMethod("standard");
+        shippingObj.setStatus("pending");
 
-        // Clear cart
-        cartDAO.clearCart(userId);
+        ShippingDAO shippingDAO = new ShippingDAO();
+        shippingDAO.createShipping(shippingObj);        
 
         // REDIRECT BASED ON PAYMENT TYPE
         switch (paymentMethod) {
-
-            case "COD" -> {
-                // COD is instantly successful
-                response.sendRedirect("payment-result?status=success&orderId=" + orderId);
-            }
-
-            case "VIETQR" -> {
-                // Redirect to VietQR processing controller
-            	response.sendRedirect("vietqr?orderId=" + orderId);
-            }
-
-            case "CARD" -> {
-                // Redirect to card payment controller
-                response.sendRedirect("card-payment.jsp?orderId=" + orderId);
-            }
-
+	        case "COD" -> {
+	            cartDAO.clearCart(userId);
+	            session.setAttribute("cartCount", 0);
+	            response.sendRedirect("payment-result?status=success&orderId=" + orderId);
+	        }
+	        case "VIETQR" -> {
+	            response.sendRedirect("vietqr?orderId=" + orderId);
+	        }
+	        case "CARD" -> {
+	            response.sendRedirect("card-payment.jsp?orderId=" + orderId);
+	        }
             default -> {
                 // Unexpected method
                 response.sendRedirect("checkout.jsp?error=Invalid payment method");

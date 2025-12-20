@@ -7,6 +7,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.CartItem;
 import model.Menu;
+import model.User;
+import service.ShippingService;
+import util.AddressUtil;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -62,9 +65,9 @@ public class CartController extends HttpServlet {
             int qty = 1;
 
             // ✅ DEFAULT OPTIONS
-            String milk = "Fresh Milk";
-            String sugar = "70%";
-            String ice = "100%";
+            String milk = null;
+            String sugar = null;
+            String ice = null;
             String toppings = ""; // optional
 
             if (request.getParameter("qty") != null) {
@@ -76,12 +79,21 @@ public class CartController extends HttpServlet {
 
                 double basePrice = product.getPrice();
                 double extraPrice = 0;
-
-                // (optional future logic)
-                // if ("Oatside".equals(milk)) extraPrice = 0.5;
-
-                double finalPrice = basePrice + extraPrice;
-
+                if (!"Bakery".equalsIgnoreCase(product.getCategory())) {
+                    // ☕ Drink defaults
+                    milk = "Fresh Milk";
+                    sugar = "70%";
+                    ice = "100%";
+                }
+	             // ☕ Drinks only
+	             if (!"Bakery".equalsIgnoreCase(product.getCategory())) {
+	                 if ("Oatside".equals(milk)) {
+	                     extraPrice = 5000;
+	                 } else if ("Cream Milk".equals(milk)) {
+	                     extraPrice = 7000;
+	                 }
+	             }
+	             double finalPrice = basePrice + extraPrice;
                 cartDAO.addToCart(
                         userId,
                         product.getId(),
@@ -130,10 +142,22 @@ public class CartController extends HttpServlet {
             subtotal = subtotal.add(price.multiply(qty));
         }
 
-        BigDecimal shipping = subtotal.compareTo(BigDecimal.ZERO) > 0
-                ? new BigDecimal("2.50")
-                : BigDecimal.ZERO;
-        BigDecimal total = subtotal.add(shipping);
+
+        ShippingService shippingService = new ShippingService();
+
+	    // get user address (single string)
+        User currentUser = (User) session.getAttribute("currentUser");
+        String fullAddress = currentUser != null ? currentUser.getAddress() : null;
+	    // OR: currentUser.getAddress()
+	    String district = AddressUtil.extractDistrict(fullAddress);
+	    // fixed city for now
+	    String city = "Ho Chi Minh City";
+	
+	    BigDecimal shipping = subtotal.compareTo(BigDecimal.ZERO) > 0
+	            ? shippingService.calculateShipping(city, district)
+	            : BigDecimal.ZERO;
+	
+	    BigDecimal total = subtotal.add(shipping);
 
         request.setAttribute("cartItems", cart);
         request.setAttribute("subtotal", subtotal);

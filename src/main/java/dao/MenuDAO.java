@@ -122,7 +122,7 @@ public class MenuDAO {
 	public List<Menu> getAllProductsForAdmin() {
 
 		List<Menu> list = new ArrayList<>();
-		String sql = "SELECT * FROM menu ORDER BY id ASC";
+		String sql = "SELECT * FROM menu ORDER BY id ASC LIMIT ? OFFSET ?";
 
 		try (Connection con = DBConnection.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
@@ -324,6 +324,22 @@ public class MenuDAO {
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
+	    }
+	}
+	
+	public boolean removeProduct(int id) {
+
+	    String sql = "DELETE FROM menu WHERE id = ?";
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+	        return ps.executeUpdate() == 1;
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return false;
 	    }
 	}
 

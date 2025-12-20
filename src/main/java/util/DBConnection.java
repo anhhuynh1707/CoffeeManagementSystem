@@ -47,7 +47,7 @@ public class DBConnection {
 	}
 	
 	//Test connection
-	/* 
+	
 	public static void main(String[] args) {
 	    try (Connection con = getConnection()) {
 	        System.out.println("✅ Database connected successfully!");
@@ -55,6 +55,6 @@ public class DBConnection {
 	        System.out.println("❌ Database connection failed!");
 	        e.printStackTrace();
 	    }
-	}*/
+	}
 
 }

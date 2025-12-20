@@ -36,6 +36,15 @@ public class AdminProductsController extends HttpServlet {
 	        response.sendRedirect(buildReturnUrl(request));
 	        return;
 	    }
+	    
+	    if ("remove".equals(op)) {
+	        int id = Integer.parseInt(request.getParameter("id"));
+	        menuDAO.removeProduct(id);
+
+	        // go back to same list state (page/filter/sort)
+	        response.sendRedirect(buildReturnUrl(request));
+	        return;
+	    }
 
 	    // 2) Read filters
 	    String q = request.getParameter("q");                // keyword
@@ -230,5 +239,7 @@ public class AdminProductsController extends HttpServlet {
 
 		return fileName;
 	}
+	
+	
 
 }
