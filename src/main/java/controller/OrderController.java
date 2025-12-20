@@ -79,12 +79,6 @@ public class OrderController extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
-        // Must be logged in
-        if (userId == null) {
-            response.sendRedirect("login.jsp");
-            return;
-        }
-
         // Get payment method (COD, VietQR, CARD)
         String paymentMethod = request.getParameter("paymentMethod");
 
@@ -144,6 +138,10 @@ public class OrderController extends HttpServlet {
 
         // Save order → returns orderId
         int orderId = orderDAO.saveOrder(order);
+
+        // Move cart → order_items (ONLY HERE)
+        orderDAO.moveCartToOrderItems(orderId, cart);
+        
         // 🔥🔥 ADD THIS BLOCK (SHIPPING SNAPSHOT) 🔥🔥
         Shipping shippingObj = new Shipping();
         shippingObj.setOrderId(orderId);
@@ -162,25 +160,17 @@ public class OrderController extends HttpServlet {
 
         // REDIRECT BASED ON PAYMENT TYPE
         switch (paymentMethod) {
-
-            case "COD" -> {
-                // COD is instantly successful
-            	orderDAO.moveCartToOrderItems(orderId, cart);
-            	cartDAO.clearCart(userId);
-            	session.setAttribute("cartCount", 0);
-                response.sendRedirect("payment-result?status=success&orderId=" + orderId);
-            }
-
-            case "VIETQR" -> {
-                // Redirect to VietQR processing controller
-            	response.sendRedirect("vietqr?orderId=" + orderId);
-            }
-
-            case "CARD" -> {
-                // Redirect to card payment controller
-                response.sendRedirect("card-payment.jsp?orderId=" + orderId);
-            }
-
+	        case "COD" -> {
+	            cartDAO.clearCart(userId);
+	            session.setAttribute("cartCount", 0);
+	            response.sendRedirect("payment-result?status=success&orderId=" + orderId);
+	        }
+	        case "VIETQR" -> {
+	            response.sendRedirect("vietqr?orderId=" + orderId);
+	        }
+	        case "CARD" -> {
+	            response.sendRedirect("card-payment.jsp?orderId=" + orderId);
+	        }
             default -> {
                 // Unexpected method
                 response.sendRedirect("checkout.jsp?error=Invalid payment method");

@@ -24,21 +24,14 @@ public class PaymentResultController extends HttpServlet {
         String status = req.getParameter("status");
         int orderId = Integer.parseInt(req.getParameter("orderId"));
 
-        // ✅ ONLY clear cart when payment is successful
         if ("success".equalsIgnoreCase(status) && userId != null) {
-
-            // Update order status if needed (VietQR success)
-            orderDAO.confirmCardPayment(orderId); // works for VietQR too
-            var cart = cartDAO.getCartByUser(userId);
-            orderDAO.moveCartToOrderItems(orderId, cart);
-
+            // ONLY clear cart (order already created)
             cartDAO.clearCart(userId);
             session.setAttribute("cartCount", 0);
         }
 
         req.setAttribute("status", status);
         req.setAttribute("orderId", orderId);
-
         req.getRequestDispatcher("payment-result.jsp").forward(req, resp);
     }
 }

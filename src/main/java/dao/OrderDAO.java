@@ -309,4 +309,25 @@ public class OrderDAO {
             return false;
         }
     }
+    public boolean confirmVietQRPayment(int orderId) {
+
+        String sql = """
+            UPDATE orders
+            SET updated_at = CURRENT_TIMESTAMP
+            WHERE order_id = ?
+              AND payment_method = 'VIETQR'
+              AND payment_status = 'pending'
+        """;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
