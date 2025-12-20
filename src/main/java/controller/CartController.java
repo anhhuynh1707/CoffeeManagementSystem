@@ -65,9 +65,9 @@ public class CartController extends HttpServlet {
             int qty = 1;
 
             // ✅ DEFAULT OPTIONS
-            String milk = "Fresh Milk";
-            String sugar = "70%";
-            String ice = "100%";
+            String milk = null;
+            String sugar = null;
+            String ice = null;
             String toppings = ""; // optional
 
             if (request.getParameter("qty") != null) {
@@ -79,12 +79,21 @@ public class CartController extends HttpServlet {
 
                 double basePrice = product.getPrice();
                 double extraPrice = 0;
-
-                // (optional future logic)
-                // if ("Oatside".equals(milk)) extraPrice = 0.5;
-
-                double finalPrice = basePrice + extraPrice;
-
+                if (!"Bakery".equalsIgnoreCase(product.getCategory())) {
+                    // ☕ Drink defaults
+                    milk = "Fresh Milk";
+                    sugar = "70%";
+                    ice = "100%";
+                }
+	             // ☕ Drinks only
+	             if (!"Bakery".equalsIgnoreCase(product.getCategory())) {
+	                 if ("Oatside".equals(milk)) {
+	                     extraPrice = 5000;
+	                 } else if ("Cream Milk".equals(milk)) {
+	                     extraPrice = 7000;
+	                 }
+	             }
+	             double finalPrice = basePrice + extraPrice;
                 cartDAO.addToCart(
                         userId,
                         product.getId(),

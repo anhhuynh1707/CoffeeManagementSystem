@@ -33,10 +33,15 @@
 						<div>
 							<strong>${item.productName}</strong>
 							<br>
-							<small>
-								Milk: ${item.milkType}, Sugar: ${item.sugarLevel}, Ice:
-								${item.iceLevel}
-							</small>
+							<c:if test="${not empty item.milkType 
+							          or not empty item.sugarLevel 
+							          or not empty item.iceLevel}">
+							    <small>
+							        Milk: ${item.milkType},
+							        Sugar: ${item.sugarLevel},
+							        Ice: ${item.iceLevel}
+							    </small>
+							</c:if>
 						</div>
 					</td>
 					<td>${item.quantity}</td>
