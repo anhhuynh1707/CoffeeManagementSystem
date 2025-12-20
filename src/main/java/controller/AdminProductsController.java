@@ -26,29 +26,89 @@ public class AdminProductsController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 	        throws ServletException, IOException {
 
+	    // 1) Handle toggle (Enable/Disable)
 	    String op = request.getParameter("op");
-
-	    if ("remove".equals(op)) {
-	        int id = Integer.parseInt(request.getParameter("id"));
-	        menuDAO.deleteProductById(id);
-	        response.sendRedirect("products");
-	        return;
-	    }
-	    
 	    if ("toggle".equals(op)) {
 	        int id = Integer.parseInt(request.getParameter("id"));
+	        menuDAO.toggleProductStatus(id);
 
-	        // flip status in DB
-	        menuDAO.toggleStatus(id);
-
-	        response.sendRedirect("products");
+	        // redirect back to same list (keep filters/sort/page)
+	        response.sendRedirect(buildReturnUrl(request));
 	        return;
 	    }
 
-	    // default: show list
-	    List<Menu> products = menuDAO.getAllProductsForAdmin();
+	    // 2) Read filters
+	    String q = request.getParameter("q");                // keyword
+	    String category = request.getParameter("category");  // coffee/tea/...
+	    String status = request.getParameter("status");      // available/unavailable
+
+	    // 3) Sorting
+	    String sortBy = request.getParameter("sortBy");
+	    String sortDir = request.getParameter("sortDir");
+	    if (sortBy == null || sortBy.isBlank()) sortBy = "id";
+	    if (sortDir == null || sortDir.isBlank()) sortDir = "asc";
+
+	    // 4) Pagination (fixed page size = 15)
+	    int page = 1;
+	    final int PAGE_SIZE = 15;
+	    String pageParam = request.getParameter("page");
+	    if (pageParam != null) {
+	        try { page = Math.max(1, Integer.parseInt(pageParam)); }
+	        catch (Exception ignored) {}
+	    }
+
+	    int totalItems = menuDAO.countProductsForAdmin(q, category, status);
+	    int totalPages = (int) Math.ceil((double) totalItems / PAGE_SIZE);
+	    if (totalPages == 0) totalPages = 1;
+	    if (page > totalPages) page = totalPages;
+
+	    int offset = (page - 1) * PAGE_SIZE;
+
+	    List<Menu> products = menuDAO.getProductsForAdminPaged(
+	            q, category, status, offset, PAGE_SIZE, sortBy, sortDir
+	    );
+
 	    request.setAttribute("products", products);
+	    request.setAttribute("page", page);
+	    request.setAttribute("totalPages", totalPages);
+	    request.setAttribute("totalItems", totalItems);
+	    request.setAttribute("sortBy", sortBy);
+	    request.setAttribute("sortDir", sortDir);
+
 	    request.getRequestDispatcher("/admin-products.jsp").forward(request, response);
+	}
+
+	private String buildReturnUrl(HttpServletRequest request) {
+	    // keep current params when returning after toggle
+	    String q = request.getParameter("q");
+	    String category = request.getParameter("category");
+	    String status = request.getParameter("status");
+	    String sortBy = request.getParameter("sortBy");
+	    String sortDir = request.getParameter("sortDir");
+	    String page = request.getParameter("page");
+
+	    StringBuilder url = new StringBuilder("products?");
+
+	    if (q != null && !q.isBlank()) url.append("q=").append(encode(q)).append("&");
+	    if (category != null && !category.isBlank()) url.append("category=").append(encode(category)).append("&");
+	    if (status != null && !status.isBlank()) url.append("status=").append(encode(status)).append("&");
+	    if (sortBy != null && !sortBy.isBlank()) url.append("sortBy=").append(encode(sortBy)).append("&");
+	    if (sortDir != null && !sortDir.isBlank()) url.append("sortDir=").append(encode(sortDir)).append("&");
+	    if (page != null && !page.isBlank()) url.append("page=").append(encode(page)).append("&");
+
+	    // remove trailing &
+	    if (url.charAt(url.length()-1) == '&' || url.charAt(url.length()-1) == '?') {
+	        url.deleteCharAt(url.length()-1);
+	    }
+	    return url.toString();
+	}
+
+	private String encode(String s) {
+	    try {
+	        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
+	    } catch (Exception e) {
+	        return s;
+	    }
 	}
 
 	// ======================

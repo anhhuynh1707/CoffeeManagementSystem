@@ -122,7 +122,7 @@ public class MenuDAO {
 	public List<Menu> getAllProductsForAdmin() {
 
 		List<Menu> list = new ArrayList<>();
-		String sql = "SELECT * FROM menu ORDER BY created_at DESC";
+		String sql = "SELECT * FROM menu ORDER BY id ASC";
 
 		try (Connection con = DBConnection.getConnection();
 				PreparedStatement ps = con.prepareStatement(sql);
@@ -203,21 +203,7 @@ public class MenuDAO {
 	        e.printStackTrace();
 	    }
 	}
-	
-	public boolean deleteProductById(int id) {
-	    String sql = "DELETE FROM menu WHERE id = ?";
 
-	    try (Connection con = DBConnection.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
-
-	        ps.setInt(1, id);
-	        return ps.executeUpdate() == 1;
-
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        return false;
-	    }
-	}
 	
 	public void toggleStatus(int id) {
 	    String sql = """
@@ -239,6 +225,145 @@ public class MenuDAO {
 	        e.printStackTrace();
 	    }
 	}
+	
+	public int countAllProductsForAdmin() {
+	    String sql = "SELECT COUNT(*) FROM menu";
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) return rs.getInt(1);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
+	}
+	
+	public List<Menu> getProductsForAdminPaged(
+	        String q, String category, String status,
+	        int offset, int limit, String sortBy, String sortDir) {
+
+	    List<Menu> list = new ArrayList<>();
+
+	    // whitelist to prevent SQL injection via sortBy/sortDir
+	    String sortCol = switch (sortBy) {
+	        case "id" -> "id";
+	        case "name" -> "name";
+	        case "price" -> "price";
+	        case "created_at" -> "created_at";
+	        default -> "id";
+	    };
+	    String dir = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+
+	    StringBuilder sql = new StringBuilder("SELECT * FROM menu WHERE 1=1");
+	    List<Object> params = new ArrayList<>();
+
+	    if (q != null && !q.isBlank()) {
+	        sql.append(" AND LOWER(name) LIKE ?");
+	        params.add("%" + q.toLowerCase() + "%");
+	    }
+	    if (category != null && !category.isBlank()) {
+	        sql.append(" AND category = ?");
+	        params.add(category);
+	    }
+	    if (status != null && !status.isBlank()) {
+	        sql.append(" AND status = ?");
+	        params.add(status);
+	    }
+
+	    sql.append(" ORDER BY ").append(sortCol).append(" ").append(dir);
+	    sql.append(" LIMIT ? OFFSET ?");
+	    params.add(limit);
+	    params.add(offset);
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                Menu item = new Menu();
+	                item.setId(rs.getInt("id"));
+	                item.setName(rs.getString("name"));
+	                item.setDescription(rs.getString("description"));
+	                item.setPrice(rs.getDouble("price"));
+	                item.setImageUrl(rs.getString("image_url"));
+	                item.setCategory(rs.getString("category"));
+	                item.setStatus(rs.getString("status"));
+	                list.add(item);
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return list;
+	}
+
+	
+	public void toggleProductStatus(int id) {
+	    String sql = """
+	        UPDATE menu
+	        SET status = CASE
+	            WHEN status = 'available' THEN 'unavailable'
+	            ELSE 'available'
+	        END
+	        WHERE id = ?
+	    """;
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	
+	public int countProductsForAdmin(String q, String category, String status) {
+	    StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM menu WHERE 1=1");
+	    List<Object> params = new ArrayList<>();
+
+	    if (q != null && !q.isBlank()) {
+	        sql.append(" AND LOWER(name) LIKE ?");
+	        params.add("%" + q.toLowerCase() + "%");
+	    }
+	    if (category != null && !category.isBlank()) {
+	        sql.append(" AND category = ?");
+	        params.add(category);
+	    }
+	    if (status != null && !status.isBlank()) {
+	        sql.append(" AND status = ?");
+	        params.add(status);
+	    }
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) return rs.getInt(1);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
+	}
+
+
+
 
 	
 
