@@ -34,6 +34,16 @@ public class AdminProductsController extends HttpServlet {
 	        response.sendRedirect("products");
 	        return;
 	    }
+	    
+	    if ("toggle".equals(op)) {
+	        int id = Integer.parseInt(request.getParameter("id"));
+
+	        // flip status in DB
+	        menuDAO.toggleStatus(id);
+
+	        response.sendRedirect("products");
+	        return;
+	    }
 
 	    // default: show list
 	    List<Menu> products = menuDAO.getAllProductsForAdmin();

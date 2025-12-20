@@ -218,6 +218,29 @@ public class MenuDAO {
 	        return false;
 	    }
 	}
+	
+	public void toggleStatus(int id) {
+	    String sql = """
+	        UPDATE menu
+	        SET status = CASE
+	            WHEN status = 'available' THEN 'unavailable'
+	            ELSE 'available'
+	        END
+	        WHERE id = ?
+	    """;
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	
 
 
 
