@@ -65,7 +65,7 @@
           <div class="value">${shipping.phone}</div>
           <div class="label">Address</div>
           <div class="value">
-            ${shipping.address}, ${shipping.district}, ${shipping.city}
+            ${shipping.address}, ${shipping.city}
           </div>
         </div>
       </div>

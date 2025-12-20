@@ -38,6 +38,7 @@ public class VietQRController extends HttpServlet {
         req.setAttribute("qrUrl", qrUrl);
         req.setAttribute("orderId", orderId);
         req.setAttribute("amount", amount);
+        req.setAttribute("createdAt", order.getCreatedAt());
         req.setAttribute("accountName", ACCOUNT_NAME);
 
         req.getRequestDispatcher("vietqr.jsp").forward(req, resp);

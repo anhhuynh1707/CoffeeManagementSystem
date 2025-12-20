@@ -30,7 +30,9 @@
 			<h1 style="color: var(--danger)">Payment Failed</h1>
 			<p class="order-id">Order ID: #${orderId}</p>
 			<p class="msg">Something went wrong. Please try again or use a different payment method.</p>
-			<a href="checkout.jsp" class="btn-primary">Try Again</a>
+			<a href="${pageContext.request.contextPath}/checkout" class="btn-primary">
+			    Try Again
+			</a>
 			<a href="menu" class="btn-secondary">Return to Menu</a>
 		</c:if>
 	</div>

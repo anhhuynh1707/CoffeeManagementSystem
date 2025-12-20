@@ -158,19 +158,16 @@ public class OrderController extends HttpServlet {
         shippingObj.setStatus("pending");
 
         ShippingDAO shippingDAO = new ShippingDAO();
-        shippingDAO.createShipping(shippingObj);
-
-        // Move cart → order_items
-        orderDAO.moveCartToOrderItems(orderId, cart);
-
-        // Clear cart
-        cartDAO.clearCart(userId);
+        shippingDAO.createShipping(shippingObj);        
 
         // REDIRECT BASED ON PAYMENT TYPE
         switch (paymentMethod) {
 
             case "COD" -> {
                 // COD is instantly successful
+            	orderDAO.moveCartToOrderItems(orderId, cart);
+            	cartDAO.clearCart(userId);
+            	session.setAttribute("cartCount", 0);
                 response.sendRedirect("payment-result?status=success&orderId=" + orderId);
             }
 

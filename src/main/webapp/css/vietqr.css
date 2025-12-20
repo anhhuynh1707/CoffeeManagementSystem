@@ -29,7 +29,16 @@ h1 {
 	color: var(--brown-accent);
 	font-size: 1.9rem;
 }
+.countdown {
+    font-weight: bold;
+    color: #8b5e3c;
+    margin-bottom: 12px;
+}
 
+#countdown {
+    color: #c0392b;
+    font-size: 1.2em;
+}
 .subtext {
 	font-size: 1rem;
 	color: #666;
