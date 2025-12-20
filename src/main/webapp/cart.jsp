@@ -2,21 +2,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Your Cart | Matcha Coffee</title>
 
-<!-- Fonts -->
-<link
-	href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap"
-	rel="stylesheet">
-<link rel="stylesheet" href="css/cart.css">
-<script src="${pageContext.request.contextPath}/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/js/cart-options.js"></script>
-<script src="${pageContext.request.contextPath}/js/weather.js"></script>
+<head>
+	<meta charset="UTF-8">
+	<title>Your Cart | Matcha Coffee</title>
+
+	<!-- Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="css/cart.css">
+	<script src="${pageContext.request.contextPath}/js/main.js"></script>
+	<script src="${pageContext.request.contextPath}/js/cart-options.js"></script>
+	<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
 <body>
@@ -24,26 +22,25 @@
 	<div class="navbar">
 
 		<!-- LEFT: LOGO -->
-		<a href="${pageContext.request.contextPath}/index.jsp"
-			class="logo-link"> Matcha Coffee ☕ </a>
+		<a href="${pageContext.request.contextPath}/index.jsp" class="logo-link"> Matcha Coffee ☕ </a>
 
 		<!-- RIGHT: ACTIONS -->
 		<div class="weather-box" id="weatherBox">
-		    <span class="weather-icon" id="weatherIcon">⛅</span>
-		    <span class="weather-text" id="weatherText">Loading...</span>
-		    <span class="separator">|</span>
-		    <span class="weather-greet"> How do you feel today,
-		        <strong>
-		            <c:choose>
-		                <c:when test="${not empty sessionScope.currentUser}">
-		                    ${sessionScope.currentUser.fullName}
-		                </c:when>
-		                <c:otherwise>
-		                    Guest
-		                </c:otherwise>
-		            </c:choose>
-		        </strong>?
-		    </span>
+			<span class="weather-icon" id="weatherIcon">⛅</span>
+			<span class="weather-text" id="weatherText">Loading...</span>
+			<span class="separator">|</span>
+			<span class="weather-greet"> How do you feel today,
+				<strong>
+					<c:choose>
+						<c:when test="${not empty sessionScope.currentUser}">
+							${sessionScope.currentUser.fullName}
+						</c:when>
+						<c:otherwise>
+							Guest
+						</c:otherwise>
+					</c:choose>
+				</strong>?
+			</span>
 		</div>
 		<div class="nav-actions">
 			<!-- USER -->
@@ -52,21 +49,19 @@
 					${sessionScope.currentUser.fullName} </span>
 
 				<div class="dropdown" id="dropdownMenu">
-					<a href="${pageContext.request.contextPath}/menu">Menu</a> <a
-						href="${pageContext.request.contextPath}/profile">Profile</a> <a
-						href="${pageContext.request.contextPath}/my-orders">Orders</a>
+					<a href="${pageContext.request.contextPath}/menu">Menu</a>
+					<a href="${pageContext.request.contextPath}/profile">Profile</a>
+					<a href="${pageContext.request.contextPath}/my-orders">Orders</a>
 					<hr>
-					<a href="${pageContext.request.contextPath}/logout" class="logout">
-						Logout </a>
+					<a href="${pageContext.request.contextPath}/logout" class="logout">Logout </a>
 				</div>
 				<!-- CART -->
-				<a href="${pageContext.request.contextPath}/cart" class="cart-btn">
-					🛒 <c:if test="${sessionScope.cartCount > 0}">
+				<a href="${pageContext.request.contextPath}/cart" class="cart-btn"> 🛒 
+					<c:if test="${sessionScope.cartCount > 0}">
 						<span class="cart-badge">${sessionScope.cartCount}</span>
 					</c:if>
 				</a>
 			</div>
-
 		</div>
 	</div>
 
@@ -79,79 +74,68 @@
 		<c:if test="${not empty successMsg}">
 			<div
 				style="margin: 15px 0; padding: 12px 18px; border-radius: 8px; background: #e3f8e5; color: #256029; border: 1px solid #a4d5aa; font-weight: 500;">
-				${successMsg}</div>
+				${successMsg}
+			</div>
 		</c:if>
 
 		<!-- EMPTY CART -->
 		<c:if test="${empty cartItems}">
 			<div class="empty">
 				<p>Your cart is empty 🍃</p>
-				<a href="${pageContext.request.contextPath}/menu"
-					class="btn-primary">Browse Menu</a>
+				<a href="${pageContext.request.contextPath}/menu" class="btn-primary">Browse Menu</a>
 			</div>
 		</c:if>
 
 		<!-- CART ITEMS -->
 		<c:forEach var="item" items="${cartItems}">
-		<c:set var="isBakery" value="${item.category == 'Bakery'}" />
-		
+			<c:set var="isBakery" value="${item.category == 'Bakery'}" />
 			<div class="cart-item">
-
 				<!-- IMAGE -->
-				<img
-					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}"
-					class="cart-img" alt="${item.productName}">
+				<img src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}" class="cart-img"
+					alt="${item.productName}">
 
 				<div class="item-info">
 					<h3>${item.productName}</h3>
 					<div class="item-price">
-					    <fmt:formatNumber
-					        value="${item.finalPrice}"
-					        groupingUsed="true"
-					        maxFractionDigits="0"/> VND
+						<fmt:formatNumber value="${item.finalPrice}" groupingUsed="true" maxFractionDigits="0" /> VND
 					</div>
 
 					<!-- CUSTOM OPTIONS -->
 					<c:if test="${!isBakery}">
-						<form class="options-form"
-							action="${pageContext.request.contextPath}/cart" method="post">
-
-
-							<input type="hidden" name="op" value="updateOptions"> <input
-								type="hidden" name="cid" value="${item.cartId}"> <input
-								type="hidden" name="milk" value="${item.milkType}"> <input
-								type="hidden" name="sugar" value="${item.sugarLevel}"> <input
-								type="hidden" name="ice" value="${item.iceLevel}">
+						<form class="options-form" action="${pageContext.request.contextPath}/cart" method="post">
+							<input type="hidden" name="op" value="updateOptions"> <input type="hidden" name="cid"
+								value="${item.cartId}"> <input type="hidden" name="milk" value="${item.milkType}">
+							<input type="hidden" name="sugar" value="${item.sugarLevel}"> <input type="hidden"
+								name="ice" value="${item.iceLevel}">
 
 							<!-- MILK -->
 							<div class="option-group">
-							    <span class="label">Milk</span>
-							    <div class="toggle-group" data-name="milk">
-							
-							        <!-- NO MILK -->
-							        <button type="button" data-value="No milk"
-							            class="toggle-btn ${item.milkType == 'No milk' || empty item.milkType ? 'active' : ''}">
-							            No milk
-							        </button>
-							
-							        <button type="button" data-value="Fresh Milk"
-							            class="toggle-btn ${item.milkType == 'Fresh Milk' ? 'active' : ''}">
-							            Fresh
-							        </button>
-							
-							        <button type="button" data-value="Oatside"
-							            class="toggle-btn ${item.milkType == 'Oatside' ? 'active' : ''}">
-							            Oatside
-							        </button>
-							
-							        <button type="button" data-value="Cream Milk"
-							            class="toggle-btn ${item.milkType == 'Cream Milk' ? 'active' : ''}">
-							            Cream
-							        </button>
-							
-							    </div>
-							</div>
+								<span class="label">Milk</span>
+								<div class="toggle-group" data-name="milk">
 
+									<!-- NO MILK -->
+									<button type="button" data-value="No milk"
+										class="toggle-btn ${item.milkType == 'No milk' || empty item.milkType ? 'active' : ''}">
+										No milk
+									</button>
+
+									<button type="button" data-value="Fresh Milk"
+										class="toggle-btn ${item.milkType == 'Fresh Milk' ? 'active' : ''}">
+										Fresh
+									</button>
+
+									<button type="button" data-value="Oatside"
+										class="toggle-btn ${item.milkType == 'Oatside' ? 'active' : ''}">
+										Oatside
+									</button>
+
+									<button type="button" data-value="Cream Milk"
+										class="toggle-btn ${item.milkType == 'Cream Milk' ? 'active' : ''}">
+										Cream
+									</button>
+
+								</div>
+							</div>
 
 							<!-- SUGAR -->
 							<div class="option-group">
@@ -182,20 +166,18 @@
 										class="toggle-btn ${item.iceLevel == '0%'   ? 'active' : ''}">0%</button>
 								</div>
 							</div>
-
 						</form>
-						</c:if>
+					</c:if>
 				</div>
 
 				<!-- ACTIONS -->
 				<div class="item-actions">
 					<div class="quantity-box">
-						<a href="cart?op=dec&cid=${item.cartId}" class="qty-btn">−</a> <span
-							class="qty-display">${item.quantity}</span> <a
-							href="cart?op=inc&cid=${item.cartId}" class="qty-btn">+</a>
+						<a href="cart?op=dec&cid=${item.cartId}" class="qty-btn">−</a>
+						<span class="qty-display">${item.quantity} </span>
+						<a href="cart?op=inc&cid=${item.cartId}" class="qty-btn">+</a>
 					</div>
-					<a href="cart?op=remove&cid=${item.cartId}" class="remove-btn">
-						Remove </a>
+					<a href="cart?op=remove&cid=${item.cartId}" class="remove-btn"> Remove </a>
 				</div>
 			</div>
 		</c:forEach>
@@ -204,49 +186,35 @@
 			<div class="summary">
 				<h2>Order Summary</h2>
 				<div class="summary-row">
-				    <span>Subtotal</span>
-				    <span>
-		                <fmt:formatNumber
-		                    value="${subtotal}"
-		                    groupingUsed="true"
-		                    maxFractionDigits="0"/> VND
-		            </span>
+					<span>Subtotal</span>
+					<span>
+						<fmt:formatNumber value="${subtotal}" groupingUsed="true" maxFractionDigits="0" /> VND
+					</span>
 				</div>
-				
 				<div class="summary-row">
-				    <span>Shipping Fee</span>
-				    <span>
-				        <c:choose>
-				            <c:when test="${not empty shipping}">
-		                        <fmt:formatNumber
-		                            value="${shipping}"
-		                            groupingUsed="true"
-		                            maxFractionDigits="0"/> VND
-		                    </c:when>
-				            <c:otherwise>
-				                Calculated at checkout
-				            </c:otherwise>
-				        </c:choose>
-				    </span>
+					<span>Shipping Fee</span>
+					<span>
+						<c:choose>
+							<c:when test="${not empty shipping}">
+								<fmt:formatNumber value="${shipping}" groupingUsed="true" maxFractionDigits="0" /> VND
+							</c:when>
+							<c:otherwise>
+								Calculated at checkout
+							</c:otherwise>
+						</c:choose>
+					</span>
 				</div>
-				
 				<div class="summary-row summary-total">
-				    <span>Total</span>
-				    <span>
-		                <fmt:formatNumber
-		                    value="${total}"
-		                    groupingUsed="true"
-		                    maxFractionDigits="0"/> VND
-		            </span>
+					<span>Total</span>
+					<span>
+						<fmt:formatNumber value="${total}" groupingUsed="true" maxFractionDigits="0" /> VND
+					</span>
 				</div>
-				
 				<p class="shipping-note">
-				    * Shipping fee is estimated based on your delivery district.
+					* Shipping fee is estimated based on your delivery district.
 				</p>
-				<a href="${pageContext.request.contextPath}/checkout"
-					class="btn-primary"> Proceed to Checkout </a> <a
-					href="${pageContext.request.contextPath}/menu"
-					class="btn-secondary"> Continue Shopping </a>
+				<a href="${pageContext.request.contextPath}/checkout" class="btn-primary"> Proceed to Checkout </a> <a
+					href="${pageContext.request.contextPath}/menu" class="btn-secondary"> Continue Shopping </a>
 			</div>
 		</c:if>
 	</div>
