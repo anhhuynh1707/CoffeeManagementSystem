@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -86,7 +87,13 @@
 						Total Cups: <b>${o.totalCups}</b>
 					</p>
 					<p>
-						Total Amount: <b>${o.totalAmount} VND</b>
+						Total Amount:
+						<b>
+					        <fmt:formatNumber
+					            value="${o.totalAmount}"
+					            groupingUsed="true"
+					            maxFractionDigits="0"/> VND
+					    </b>
 					</p>
 					<p>
 						Payment Method: <b>${o.paymentMethod}</b>
@@ -106,7 +113,7 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-
+				<a href="order-details?id=${o.id}" class="btn-view">View Details</a>
 				<a href="${pageContext.request.contextPath}/shipping?orderId=${o.id}"
 				   class="btn-view">
 				    Track Order

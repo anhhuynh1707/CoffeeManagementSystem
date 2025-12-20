@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -134,7 +135,12 @@
 				<img
 					src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}">
 				<h3>${item.name}</h3>
-				<div class="price">${item.price} VND</div>
+				<div class="price">
+				    <fmt:formatNumber
+				        value="${item.price}"
+				        groupingUsed="true"
+				        maxFractionDigits="0"/> VND
+				</div>	
 
 				<form action="${pageContext.request.contextPath}/cart" method="get">
 					<input type="hidden" name="op" value="add"> <input

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -103,7 +104,12 @@
 
 				<div class="item-info">
 					<h3>${item.productName}</h3>
-					<div class="item-price">${item.finalPrice} VND</div>
+					<div class="item-price">
+					    <fmt:formatNumber
+					        value="${item.finalPrice}"
+					        groupingUsed="true"
+					        maxFractionDigits="0"/> VND
+					</div>
 
 					<!-- CUSTOM OPTIONS -->
 					<c:if test="${!isBakery}">
@@ -199,7 +205,12 @@
 				<h2>Order Summary</h2>
 				<div class="summary-row">
 				    <span>Subtotal</span>
-				    <span>${subtotal} VND</span>
+				    <span>
+		                <fmt:formatNumber
+		                    value="${subtotal}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
+		            </span>
 				</div>
 				
 				<div class="summary-row">
@@ -207,8 +218,11 @@
 				    <span>
 				        <c:choose>
 				            <c:when test="${not empty shipping}">
-				                ${shipping} VND
-				            </c:when>
+		                        <fmt:formatNumber
+		                            value="${shipping}"
+		                            groupingUsed="true"
+		                            maxFractionDigits="0"/> VND
+		                    </c:when>
 				            <c:otherwise>
 				                Calculated at checkout
 				            </c:otherwise>
@@ -218,7 +232,12 @@
 				
 				<div class="summary-row summary-total">
 				    <span>Total</span>
-				    <span>${total} VND</span>
+				    <span>
+		                <fmt:formatNumber
+		                    value="${total}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
+		            </span>
 				</div>
 				
 				<p class="shipping-note">

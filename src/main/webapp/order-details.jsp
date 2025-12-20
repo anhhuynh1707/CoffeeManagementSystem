@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -27,7 +28,6 @@
 		<table>
 			<tr>
 				<th>Product</th>
-				<th>Name</th>
 				<th>Quantity</th>
 				<th>Final Price</th>
 			</tr>
@@ -45,17 +45,30 @@
 						</div></td>
 
 					<td>${item.quantity}</td>
-					<td>${item.finalPrice} VND</td>
+					<td> <fmt:formatNumber
+		                    value="${item.finalPrice * item.quantity}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
+		            </td>
 				</tr>
 			</c:forEach>
 		</table>
 
 		<div class="total-box">
-		    Subtotal: ${order.subtotal} VND<br>
-		    Shipping: ${order.shippingFee} VND<br>
+		    Subtotal: <fmt:formatNumber
+		                    value="${order.subtotal}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND<br>
+		    Shipping: <fmt:formatNumber
+		                    value="${order.shippingFee}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND<br>
 		    Total:
 		    <span style="color: var(--matcha-dark);">
-		        ${order.totalAmount} VND
+		        <fmt:formatNumber
+		                    value="${order.totalAmount}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
 		    </span>
 		</div>
 

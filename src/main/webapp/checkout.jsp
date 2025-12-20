@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -58,17 +59,32 @@
 
 		    <div class="summary-row">
 		        <span>Subtotal</span>
-		        <span>${subtotal} VND</span>
+		        <span>
+		        	<fmt:formatNumber
+		            value="${subtotal}"
+		            groupingUsed="true"
+		            maxFractionDigits="0"/> VND
+		         </span>
 		    </div>
 		
 		    <div class="summary-row">
 		        <span>Shipping Fee</span>
-		        <span>${shipping} VND</span>
+		        <span>
+		                <fmt:formatNumber
+		                    value="${shipping}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
+		        </span>
 		    </div>
 		
 		    <div class="summary-row summary-total">
 		        <span>Total</span>
-		        <span>${total} VND</span>
+		        <span>
+		                <fmt:formatNumber
+		                    value="${total}"
+		                    groupingUsed="true"
+		                    maxFractionDigits="0"/> VND
+		        </span>
 		    </div>
 		
 		    <p class="note">
@@ -84,18 +100,15 @@
 			<label class="payment-option">
 				<input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery(COD)
 			</label>
-			<label class="payment-option"> <label>
-			<input
-					type="radio" name="paymentMethod" value="VIETQR"> </label> VietQR -
-				Pay with QR code
-			</label> <label class="payment-option"> <input type="radio"
+			<label class="payment-option">
+				<input type="radio" name="paymentMethod" value="VIETQR"> VietQR - Pay with QR code
+			</label>
+			<label class="payment-option"> <input type="radio"
 				name="paymentMethod" value="CARD"> Credit / Debit Card
 			</label>
 
 			<button type="submit" class="btn-primary">Confirm Order</button>
 		</form>
-
 	</div>
-
 </body>
 </html>
