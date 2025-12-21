@@ -21,15 +21,94 @@ public class CartController extends HttpServlet {
     private CartDAO cartDAO = new CartDAO();
     private MenuDAO menuDAO = new MenuDAO();
     
+    
+    
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+    	
+    	System.out.println("[CART] doPost op=" + request.getParameter("op")
+        + " pid=" + request.getParameter("pid")
+        + " qty=" + request.getParameter("qty")
+        + " userId=" + request.getSession().getAttribute("userId"));
+
 
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
+        if (userId == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+
         String op = request.getParameter("op");
 
+        /* ========= ADD TO CART (FROM menu.jsp POST) ========= */
+        if ("add".equals(op)) {
+
+            String pid = request.getParameter("pid");
+            if (pid != null) {
+
+                int qty = 1;
+                String qtyParam = request.getParameter("qty");
+                if (qtyParam != null && !qtyParam.isBlank()) {
+                    qty = Integer.parseInt(qtyParam);
+                }
+
+                // defaults
+                String milk = "";
+                String sugar = "";
+                String ice = "";
+                String toppings = "";
+
+                Menu product = menuDAO.getMenuById(Integer.parseInt(pid));
+                if (product != null) {
+
+                    double basePrice = product.getPrice();
+                    double extraPrice = 0;
+
+                    if (!"Bakery".equalsIgnoreCase(product.getCategory())) {
+                        milk = "Fresh Milk";
+                        sugar = "70%";
+                        ice = "100%";
+                    }
+
+                    double finalPrice = basePrice + extraPrice;
+
+                    cartDAO.addToCart(
+                            userId,
+                            product.getId(),
+                            qty,
+                            basePrice,
+                            extraPrice,
+                            finalPrice,
+                            milk,
+                            sugar,
+                            ice,
+                            toppings
+                    );
+
+                    // update cart badge count
+                    int cartCount = cartDAO.getTotalQuantity(userId);
+                    session.setAttribute("cartCount", cartCount);
+                }
+                System.out.println("[CART] ADD called at " + System.currentTimeMillis()
+                + " userId=" + userId + " pid=" + pid + " qty=" + qty);
+            }
+            
+            
+
+            // stay on menu (your requirement)
+            response.sendRedirect(request.getContextPath() + "/menu");
+            return;
+            
+
+        }
+
+
+
+        /* ========= UPDATE OPTIONS ========= */
         if ("updateOptions".equals(op)) {
 
             int cartId = Integer.parseInt(request.getParameter("cid"));
@@ -38,11 +117,15 @@ public class CartController extends HttpServlet {
             String ice = request.getParameter("ice");
 
             cartDAO.updateOptions(cartId, userId, milk, sugar, ice);
+
+            response.sendRedirect(request.getContextPath() + "/cart");
+            return;
         }
 
+        // fallback
         response.sendRedirect(request.getContextPath() + "/cart");
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {

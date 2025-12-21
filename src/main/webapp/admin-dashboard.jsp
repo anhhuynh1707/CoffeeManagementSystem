@@ -183,8 +183,11 @@ tr:hover {
 	<!-- SIDEBAR -->
 	<div class="sidebar">
 		<h2>☘ Admin Panel</h2>
-		<a href="dashboard">Dashboard</a> <a href="products">Products</a> <a
-			href="orders">Orders</a> <a href="users">Users</a> <a href="logout">Logout</a>
+		<a href="${pageContext.request.contextPath}/dashboard">Dashboard</a>
+		<a href="products">Products</a> 
+		<a href="orders">Orders</a> 
+		<a href="users">Users</a> 
+		<a href="logout">Logout</a>
 			<div class="sidebar-footer">
 			<a href="${pageContext.request.contextPath}/" class="back-home">← Back to Homepage</a>
     </div>

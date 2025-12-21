@@ -9,67 +9,43 @@ import java.util.List;
 
 public class CartDAO {
 
-	// Add item OR increase quantity if already exists
 	public void addToCart(int userId, int productId, int quantity, double basePrice, double extraPrice,
 			double finalPrice, String milk, String sugar, String ice, String toppings) {
+		
+		milk = (milk == null) ? "" : milk.trim();
+		sugar = (sugar == null) ? "" : sugar.trim();
+		ice = (ice == null) ? "" : ice.trim();
+		toppings = (toppings == null) ? "" : toppings.trim();
 
-		String checkSql = """
-				SELECT cart_id
-				FROM cart_items
-				WHERE user_id = ?
-				AND product_id = ?
-				AND milk_type = ?
-				AND sugar_level = ?
-				AND ice_level = ?
-				""";
 
-		String insertSql = """
+		String sql = """
 				INSERT INTO cart_items
-				(user_id, product_id, quantity,
-				base_price, extra_price, final_price,
+				(user_id, product_id, quantity, base_price, extra_price, final_price,
 				milk_type, sugar_level, ice_level, toppings)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE
+				  quantity = quantity + VALUES(quantity),
+				  base_price = VALUES(base_price),
+				  extra_price = VALUES(extra_price),
+				  final_price = VALUES(final_price),
+				  toppings = VALUES(toppings),
+				  updated_at = CURRENT_TIMESTAMP
 				""";
 
-		String updateSql = """
-				UPDATE cart_items
-				SET quantity = quantity + ?
-				WHERE cart_id = ?
-				""";
+		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
-		try (Connection con = DBConnection.getConnection();
-				PreparedStatement checkPs = con.prepareStatement(checkSql)) {
+			ps.setInt(1, userId);
+			ps.setInt(2, productId);
+			ps.setInt(3, quantity);
+			ps.setDouble(4, basePrice);
+			ps.setDouble(5, extraPrice);
+			ps.setDouble(6, finalPrice);
+			ps.setString(7, milk);
+			ps.setString(8, sugar);
+			ps.setString(9, ice);
+			ps.setString(10, toppings);
 
-			checkPs.setInt(1, userId);
-			checkPs.setInt(2, productId);
-			checkPs.setString(3, milk);
-			checkPs.setString(4, sugar);
-			checkPs.setString(5, ice);
-
-			ResultSet rs = checkPs.executeQuery();
-
-			if (rs.next()) {
-				int cartId = rs.getInt("cart_id");
-				try (PreparedStatement ps = con.prepareStatement(updateSql)) {
-					ps.setInt(1, quantity);
-					ps.setInt(2, cartId);
-					ps.executeUpdate();
-				}
-			} else {
-				try (PreparedStatement ps = con.prepareStatement(insertSql)) {
-					ps.setInt(1, userId);
-					ps.setInt(2, productId);
-					ps.setInt(3, quantity);
-					ps.setDouble(4, basePrice);
-					ps.setDouble(5, extraPrice);
-					ps.setDouble(6, finalPrice);
-					ps.setString(7, milk);
-					ps.setString(8, sugar);
-					ps.setString(9, ice);
-					ps.setString(10, toppings);
-					ps.executeUpdate();
-				}
-			}
+			ps.executeUpdate();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -218,7 +194,7 @@ public class CartDAO {
 	public void updateOptions(int cartId, int userId, String milk, String sugar, String ice) {
 		// 🥐 Bakery item → ignore updates
 		if (milk == null) {
-		    return;
+			return;
 		}
 		double extraPrice = 0;
 		// 🧮 PRICE RULES (milk affects price)
@@ -226,11 +202,10 @@ public class CartDAO {
 			extraPrice = 5000;
 		} else if ("Cream Milk".equals(milk)) {
 			extraPrice = 7000;
+		} else if ("No milk".equals(milk)) {
+			extraPrice = 0;
 		}
-		else if ("No milk".equals(milk)) {
-		    extraPrice = 0;
-		}
-		
+
 		// Fresh Milk → +0
 		String sql = """
 				UPDATE cart_items

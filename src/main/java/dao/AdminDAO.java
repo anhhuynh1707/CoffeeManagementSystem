@@ -27,13 +27,16 @@ public class AdminDAO {
 
     // ---- TOTAL USERS ----
     public int getTotalUsers() {
-        String sql = "SELECT COUNT (*) FROM users WHERE role = 'customer'"; //count all the users except admins
+        String sql = "SELECT COUNT(*) AS total FROM users WHERE role = ?";
 
         try (Connection con = DBConnection.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            if (rs.next()) return rs.getInt(1);
+            ps.setString(1, "customer");
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt("total");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

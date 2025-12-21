@@ -144,20 +144,20 @@
         <div class="price">
           <fmt:formatNumber value="${item.price}" groupingUsed="true" maxFractionDigits="0" />
           VND
-        </div>
-
-        <form action="${pageContext.request.contextPath}/cart" method="get">
-          <input type="hidden" name="op" value="add" />
-          <input type="hidden" name="pid" value="${item.id}" />
-
-          <div class="qty-control">
+        </div>          
+          <form action="${pageContext.request.contextPath}/cart" method="post">
+		    <!-- REQUIRED -->
+		    <input type="hidden" name="op" value="add">
+		    <input type="hidden" name="pid" value="${item.id}">
+		    
+		              <div class="qty-control">
             <button type="button" onclick="decreaseQty(this)">−</button>
             <input type="number" name="qty" value="1" min="1" max="20" readonly />
             <button type="button" onclick="increaseQty(this)">+</button>
           </div>
+          	<button type="submit" class="add-btn" onclick="this.disabled=true; this.form.submit();"> Add to cart </button>
+		</form>
 
-          <button type="submit" class="add-btn">Add to cart</button>
-        </form>
       </div>
     </c:forEach>
   </div>
