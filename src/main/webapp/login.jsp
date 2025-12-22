@@ -35,7 +35,7 @@
 
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" name="email" class="form-control" required placeholder="Enter your email">
+                <input type="text" name="email" class="form-control" required placeholder="Enter your email">
             </div>
 
             <div class="form-group">
