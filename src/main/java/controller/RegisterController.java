@@ -45,6 +45,14 @@ public class RegisterController extends HttpServlet {
             request.getRequestDispatcher("/register.jsp").forward(request, response);
             return;
         }
+        
+        //Email validation
+        String emailPattern = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (email != null && !email.trim().isEmpty()) {
+            if (!email.matches(emailPattern)) {
+                request.setAttribute("errorEmail", "Invalid email format.");
+            }
+        }
 
         if(!password.equals(confirmPassword)) {
             request.setAttribute("error", "Passwords do not match.");
