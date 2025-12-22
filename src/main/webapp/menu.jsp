@@ -155,7 +155,7 @@
             <input type="number" name="qty" value="1" min="1" max="20" readonly />
             <button type="button" onclick="increaseQty(this)">+</button>
           </div>
-          	<button type="submit" class="add-btn" onclick="this.disabled=true; this.form.submit();"> Add to cart </button>
+          	<button type="submit" class="btn-add" onclick="this.disabled=true; this.form.submit();"> Add to cart </button>
 		</form>
 
       </div>
