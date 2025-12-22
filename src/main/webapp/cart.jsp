@@ -91,9 +91,8 @@
 			<c:set var="isBakery" value="${item.category == 'Bakery'}" />
 			<div class="cart-item">
 				<!-- IMAGE -->
-				<img src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}" class="cart-img"
+					<img src="${pageContext.request.contextPath}/uploads/menu/${item.imageUrl}" class="cart-img"
 					alt="${item.productName}">
-
 				<div class="item-info">
 					<h3>${item.productName}</h3>
 					<div class="item-price">

@@ -1,17 +1,13 @@
 package util;
 
 public class AddressUtil {
-	public static String extractDistrict(String address) {
-
-	    if (address == null || address.trim().isEmpty()) {
-	        return null;
-	    }
-
-	    String[] parts = address.split(",");
-	    if (parts.length == 0) {
-	        return null;
-	    }
-
-	    return parts[parts.length - 1].trim();
+	public static String extractDistrict(String fullAddress) {
+		if (fullAddress == null)
+			return null;
+		String[] parts = fullAddress.split(",");
+		if (parts.length < 2)
+			return null;
+		String district = parts[parts.length - 1].trim();
+		return district.isEmpty() ? null : district;
 	}
 }

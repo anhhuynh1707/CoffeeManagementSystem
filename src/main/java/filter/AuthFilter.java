@@ -57,7 +57,8 @@ public class AuthFilter implements Filter {
                 || path.endsWith(".png")
                 || path.endsWith(".jpg")
                 || path.endsWith(".jpeg")
-                || path.endsWith(".gif")) {
+                || path.endsWith(".gif")
+                || path.startsWith("/uploads")){
 
             chain.doFilter(request, response);
             return;

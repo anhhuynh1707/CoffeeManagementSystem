@@ -212,3 +212,7 @@ h1 {
 .btn-view:hover {
 	background: var(--matcha-dark);
 }
+
+.status-processing { background: #3a86ff; }
+.status-ready { background: #d1a229; color: #1f1f1f; }
+.status-completed { background: #4CAF50; }

@@ -8,24 +8,27 @@ import util.DBConnection;
 public class ShippingDAO {
 	public Integer getShippingFee(String city, String district) {
 
-	    if (district == null) {
-	        return null;
-	    }
+	    if (district == null || district.isBlank()) return null;
 
-	    String sql = """
-	        SELECT shipping_fee
-	        FROM shipping_zone
-	        WHERE LOWER(TRIM(district)) = ?
-	    """;
+	    // if you ever pass null city, still allow district-only
+	    boolean hasCity = (city != null && !city.isBlank());
+
+	    String sql = hasCity
+	        ? "SELECT shipping_fee FROM shipping_zone WHERE LOWER(TRIM(city)) = ? AND LOWER(TRIM(district)) = ? LIMIT 1"
+	        : "SELECT shipping_fee FROM shipping_zone WHERE LOWER(TRIM(district)) = ? LIMIT 1";
 
 	    try (Connection con = DBConnection.getConnection();
 	         PreparedStatement ps = con.prepareStatement(sql)) {
 
-	        ps.setString(1, district.trim().toLowerCase());
+	        if (hasCity) {
+	            ps.setString(1, city.trim().toLowerCase());
+	            ps.setString(2, district.trim().toLowerCase());
+	        } else {
+	            ps.setString(1, district.trim().toLowerCase());
+	        }
 
-	        ResultSet rs = ps.executeQuery();
-	        if (rs.next()) {
-	            return rs.getInt("shipping_fee");
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) return rs.getInt(1);
 	        }
 
 	    } catch (SQLException e) {
@@ -34,14 +37,27 @@ public class ShippingDAO {
 
 	    return null;
 	}
+
 	public void createShipping(Shipping shipping) {
 
-        String sql = """
-            INSERT INTO shipping
-            (order_id, receiver_name, phone, address, city, district, ward,
-             shipping_fee, method, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+		String sql = """
+			    INSERT INTO shipping
+			    (order_id, receiver_name, phone, address, city, district, ward,
+			     shipping_fee, method, status)
+			    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			    ON DUPLICATE KEY UPDATE
+			      receiver_name = VALUES(receiver_name),
+			      phone = VALUES(phone),
+			      address = VALUES(address),
+			      city = VALUES(city),
+			      district = VALUES(district),
+			      ward = VALUES(ward),
+			      shipping_fee = VALUES(shipping_fee),
+			      method = VALUES(method),
+			      status = VALUES(status),
+			      updated_at = CURRENT_TIMESTAMP
+			""";	
+
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {

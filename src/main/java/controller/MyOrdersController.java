@@ -21,6 +21,10 @@ public class MyOrdersController extends HttpServlet {
         HttpSession session = request.getSession();
         Integer userId = (Integer) session.getAttribute("userId");
 
+        if (userId == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
 
         List<Order> orders = orderDAO.getOrdersByUser(userId);
 

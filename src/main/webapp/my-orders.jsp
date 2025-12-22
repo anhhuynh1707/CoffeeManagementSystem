@@ -13,6 +13,8 @@
 	<script src="${pageContext.request.contextPath}/js/weather.js"></script>
 </head>
 
+
+
 <body>
 	<div class="navbar">
 
@@ -88,19 +90,38 @@
 						Payment Method: <b>${o.paymentMethod}</b>
 					</p>
 
-					<c:choose>
-						<c:when test="${o.status == 'confirmed'}">
-							<div class="status status-confirmed">Confirmed</div>
-						</c:when>
+						<c:choose>
+						  <c:when test="${o.status == 'pending'}">
+						    <div class="status status-pending">Pending</div>
+						  </c:when>
+						
+						  <c:when test="${o.status == 'confirmed'}">
+						    <div class="status status-confirmed">Confirmed</div>
+						  </c:when>
+						
+						  <c:when test="${o.status == 'preparing'}">
+						    <div class="status status-processing">Preparing</div>
+						  </c:when>
+						
+						  <c:when test="${o.status == 'ready'}">
+						    <div class="status status-ready">Ready</div>
+						  </c:when>
+						
+						  <c:when test="${o.status == 'completed'}">
+						    <div class="status status-completed">Completed</div>
+						  </c:when>
+						
+						  <c:when test="${o.status == 'cancelled'}">
+						    <div class="status status-cancelled">Cancelled</div>
+						  </c:when>
+						
+						  <c:otherwise>
+						    <div class="status status-pending">
+						      <c:out value="${empty o.status ? 'pending' : o.status}" />
+						    </div>
+						  </c:otherwise>
+						</c:choose>
 
-						<c:when test="${o.status == 'pending'}">
-							<div class="status status-pending">Pending</div>
-						</c:when>
-
-						<c:otherwise>
-							<div class="status status-cancelled">Cancelled</div>
-						</c:otherwise>
-					</c:choose>
 				</div>
 				<a href="order-details?id=${o.id}" class="btn-view">View Details</a>
 				<a href="${pageContext.request.contextPath}/shipping?orderId=${o.id}" class="btn-view">Track Order </a>

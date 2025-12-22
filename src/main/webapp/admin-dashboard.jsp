@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -154,6 +156,27 @@ tr:hover {
 		width: 100%;
 	}
 }
+
+    .back-home {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--white);
+    }
+
+    .back-home:hover {
+      background: var(--matcha-green);
+      color: var(--matcha-dark);
+    }
+
+    .back-home:active {
+      transform: scale(0.98);
+    }
 </style>
 </head>
 
@@ -162,8 +185,14 @@ tr:hover {
 	<!-- SIDEBAR -->
 	<div class="sidebar">
 		<h2>☘ Admin Panel</h2>
-		<a href="dashboard">Dashboard</a> <a href="products">Products</a> <a
-			href="orders">Orders</a> <a href="users">Users</a> <a href="logout">Logout</a>
+		<a href="${pageContext.request.contextPath}/dashboard">Dashboard</a>
+		<a href="products">Products</a> 
+		<a href="orders">Orders</a> 
+		<a href="users">Users</a> 
+		<a href="logout">Logout</a>
+			<div class="sidebar-footer">
+			<a href="${pageContext.request.contextPath}/" class="back-home">← Back to Homepage</a>
+    </div>
 	</div>
 
 	<!-- MAIN CONTENT -->
@@ -183,7 +212,9 @@ tr:hover {
 			</div>
 			<div class="stat-card">
 				<h3>Revenue</h3>
-				<div class="stat-number">$${totalRevenue}</div>
+				<div class="stat-number">
+  					<fmt:formatNumber value="${totalRevenue}" groupingUsed="true" maxFractionDigits="0" /> VND
+				</div>
 			</div>
 			<div class="stat-card">
 				<h3>Products</h3>
@@ -217,7 +248,9 @@ tr:hover {
 				<tr>
 					<td>#${o.id}</td>
 					<td>${o.customerName}</td>
-					<td>$${o.totalAmount}</td>
+					<td>
+  						<fmt:formatNumber value="${o.totalAmount}" groupingUsed="true" maxFractionDigits="0" /> VND
+					</td>
 					<td>${o.createdAt}</td>
 
 					<td><span

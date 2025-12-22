@@ -29,7 +29,7 @@
 			<c:forEach var="item" items="${items}">
 				<tr>
 					<td class="product-cell">
-						<img src="${pageContext.request.contextPath}/img/menu/${item.imageUrl}" class="product-img">
+						<img src="${pageContext.request.contextPath}/uploads/menu/${item.imageUrl}" class="product-img" alt="${item.productName}">
 						<div>
 							<strong>${item.productName}</strong>
 							<br>

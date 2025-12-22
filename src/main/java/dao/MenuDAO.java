@@ -9,45 +9,279 @@ import java.util.List;
 
 public class MenuDAO {
 
-    // Get all items (including category, image, price)
+	// Get all items (including category, image, price)
 	public List<Menu> getMenu(String category, String keyword, String sort) {
+
+		List<Menu> list = new ArrayList<>();
+
+		StringBuilder sql = new StringBuilder("SELECT * FROM menu WHERE status = 'available'");
+
+		// Filter by category
+		if (category != null && !category.equals("all")) {
+			sql.append(" AND category = ?");
+		}
+
+		// Search by name
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			sql.append(" AND LOWER(name) LIKE ?");
+		}
+
+		// Sort by price
+		if ("price_asc".equals(sort)) {
+			sql.append(" ORDER BY price ASC");
+		} else if ("price_desc".equals(sort)) {
+			sql.append(" ORDER BY price DESC");
+		} else {
+			sql.append(" ORDER BY created_at DESC");
+		}
+
+		try (Connection con = DBConnection.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+			int index = 1;
+
+			if (category != null && !category.equals("all")) {
+				ps.setString(index++, category);
+			}
+
+			if (keyword != null && !keyword.trim().isEmpty()) {
+				ps.setString(index++, "%" + keyword.toLowerCase() + "%");
+			}
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					Menu item = new Menu();
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setDescription(rs.getString("description"));
+					item.setPrice(rs.getDouble("price"));
+					item.setImageUrl(rs.getString("image_url"));
+					item.setCategory(rs.getString("category"));
+					item.setStatus(rs.getString("status"));
+
+					Timestamp created = rs.getTimestamp("created_at");
+					Timestamp updated = rs.getTimestamp("updated_at");
+
+					if (created != null)
+						item.setCreatedAt(created.toLocalDateTime());
+					if (updated != null)
+						item.setUpdatedAt(updated.toLocalDateTime());
+
+					list.add(item);
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	// Get a single menu item by ID
+	public Menu getMenuById(int id) {
+
+		String sql = "SELECT * FROM menu WHERE id = ? AND status = 'available'";
+
+		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, id);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+
+					Menu item = new Menu();
+
+					item.setId(rs.getInt("id"));
+					item.setName(rs.getString("name"));
+					item.setDescription(rs.getString("description"));
+					item.setPrice(rs.getDouble("price"));
+					item.setImageUrl(rs.getString("image_url"));
+					item.setCategory(rs.getString("category"));
+					item.setStatus(rs.getString("status"));
+
+					Timestamp created = rs.getTimestamp("created_at");
+					Timestamp updated = rs.getTimestamp("updated_at");
+
+					if (created != null)
+						item.setCreatedAt(created.toLocalDateTime());
+					if (updated != null)
+						item.setUpdatedAt(updated.toLocalDateTime());
+
+					return item; // return the found menu item
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return null; // if no item found
+	}
+
+	public List<Menu> getAllProductsForAdmin() {
+
+		List<Menu> list = new ArrayList<>();
+		String sql = "SELECT * FROM menu ORDER BY id ASC LIMIT ? OFFSET ?";
+
+		try (Connection con = DBConnection.getConnection();
+				PreparedStatement ps = con.prepareStatement(sql);
+				ResultSet rs = ps.executeQuery()) {
+
+			while (rs.next()) {
+				Menu item = new Menu();
+				item.setId(rs.getInt("id"));
+				item.setName(rs.getString("name"));
+				item.setDescription(rs.getString("description"));
+				item.setPrice(rs.getDouble("price"));
+				item.setImageUrl(rs.getString("image_url"));
+				item.setCategory(rs.getString("category"));
+				item.setStatus(rs.getString("status"));
+
+				Timestamp created = rs.getTimestamp("created_at");
+				Timestamp updated = rs.getTimestamp("updated_at");
+
+				if (created != null)
+					item.setCreatedAt(created.toLocalDateTime());
+				if (updated != null)
+					item.setUpdatedAt(updated.toLocalDateTime());
+
+				list.add(item);
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	public boolean addProduct(Menu product) {
+
+		String sql = """
+				    INSERT INTO menu (name, description, price, image_url, category, status)
+				    VALUES (?, ?, ?, ?, ?, ?)
+				""";
+
+		try (Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, product.getName());
+			ps.setString(2, product.getDescription());
+			ps.setDouble(3, product.getPrice());
+			ps.setString(4, product.getImageUrl()); // <-- path like "img/menu/xxx.jpg"
+			ps.setString(5, product.getCategory());
+			ps.setString(6, product.getStatus()); // "available" or "unavailable"
+
+			return ps.executeUpdate() == 1;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public void updateProductTextOnly(Menu product) {
+	    String sql = """
+	        UPDATE menu
+	        SET name = ?, description = ?, category = ?, price = ?, status = ?
+	        WHERE id = ?
+	    """;
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setString(1, product.getName());
+	        ps.setString(2, product.getDescription());
+	        ps.setString(3, product.getCategory());
+	        ps.setDouble(4, product.getPrice());
+	        ps.setString(5, product.getStatus());
+	        ps.setInt(6, product.getId());
+
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	
+	public void toggleStatus(int id) {
+	    String sql = """
+	        UPDATE menu
+	        SET status = CASE
+	            WHEN status = 'available' THEN 'unavailable'
+	            ELSE 'available'
+	        END
+	        WHERE id = ?
+	    """;
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, id);
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	public int countAllProductsForAdmin() {
+	    String sql = "SELECT COUNT(*) FROM menu";
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement ps = con.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) return rs.getInt(1);
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
+	}
+	
+	public List<Menu> getProductsForAdminPaged(
+	        String q, String category, String status,
+	        int offset, int limit, String sortBy, String sortDir) {
 
 	    List<Menu> list = new ArrayList<>();
 
-	    StringBuilder sql = new StringBuilder(
-	        "SELECT * FROM menu WHERE status = 'available'"
-	    );
+	    // whitelist to prevent SQL injection via sortBy/sortDir
+	    String sortCol = switch (sortBy) {
+	        case "id" -> "id";
+	        case "name" -> "name";
+	        case "price" -> "price";
+	        case "created_at" -> "created_at";
+	        default -> "id";
+	    };
+	    String dir = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
 
-	    // Filter by category
-	    if (category != null && !category.equals("all")) {
-	        sql.append(" AND category = ?");
-	    }
+	    StringBuilder sql = new StringBuilder("SELECT * FROM menu WHERE 1=1");
+	    List<Object> params = new ArrayList<>();
 
-	    // Search by name
-	    if (keyword != null && !keyword.trim().isEmpty()) {
+	    if (q != null && !q.isBlank()) {
 	        sql.append(" AND LOWER(name) LIKE ?");
+	        params.add("%" + q.toLowerCase() + "%");
+	    }
+	    if (category != null && !category.isBlank()) {
+	        sql.append(" AND category = ?");
+	        params.add(category);
+	    }
+	    if (status != null && !status.isBlank()) {
+	        sql.append(" AND status = ?");
+	        params.add(status);
 	    }
 
-	    // Sort by price
-	    if ("price_asc".equals(sort)) {
-	        sql.append(" ORDER BY price ASC");
-	    } else if ("price_desc".equals(sort)) {
-	        sql.append(" ORDER BY price DESC");
-	    } else {
-	        sql.append(" ORDER BY created_at DESC");
-	    }
+	    sql.append(" ORDER BY ").append(sortCol).append(" ").append(dir);
+	    sql.append(" LIMIT ? OFFSET ?");
+	    params.add(limit);
+	    params.add(offset);
 
-	    try (Connection con = DBConnection.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql.toString())) {
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-	        int index = 1;
-
-	        if (category != null && !category.equals("all")) {
-	            ps.setString(index++, category);
-	        }
-
-	        if (keyword != null && !keyword.trim().isEmpty()) {
-	            ps.setString(index++, "%" + keyword.toLowerCase() + "%");
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
 	        }
 
 	        try (ResultSet rs = ps.executeQuery()) {
@@ -60,61 +294,95 @@ public class MenuDAO {
 	                item.setImageUrl(rs.getString("image_url"));
 	                item.setCategory(rs.getString("category"));
 	                item.setStatus(rs.getString("status"));
-
-	                Timestamp created = rs.getTimestamp("created_at");
-	                Timestamp updated = rs.getTimestamp("updated_at");
-
-	                if (created != null) item.setCreatedAt(created.toLocalDateTime());
-	                if (updated != null) item.setUpdatedAt(updated.toLocalDateTime());
-
 	                list.add(item);
 	            }
 	        }
 
-	    } catch (SQLException e) {
+	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
 
 	    return list;
 	}
+
 	
-	// Get a single menu item by ID
-	public Menu getMenuById(int id) {
+	public void toggleProductStatus(int id) {
+	    String sql = """
+	        UPDATE menu
+	        SET status = CASE
+	            WHEN status = 'available' THEN 'unavailable'
+	            ELSE 'available'
+	        END
+	        WHERE id = ?
+	    """;
 
-	    String sql = "SELECT * FROM menu WHERE id = ? AND status = 'available'";
-
-	    try (Connection con = DBConnection.getConnection();
-	         PreparedStatement ps = con.prepareStatement(sql)) {
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
 	        ps.setInt(1, id);
+	        ps.executeUpdate();
 
-	        try (ResultSet rs = ps.executeQuery()) {
-	            if (rs.next()) {
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+	
+	public boolean removeProduct(int id) {
 
-	                Menu item = new Menu();
+	    String sql = "DELETE FROM menu WHERE id = ?";
 
-	                item.setId(rs.getInt("id"));
-	                item.setName(rs.getString("name"));
-	                item.setDescription(rs.getString("description"));
-	                item.setPrice(rs.getDouble("price"));
-	                item.setImageUrl(rs.getString("image_url"));
-	                item.setCategory(rs.getString("category"));
-	                item.setStatus(rs.getString("status"));
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	                Timestamp created = rs.getTimestamp("created_at");
-	                Timestamp updated = rs.getTimestamp("updated_at");
-
-	                if (created != null) item.setCreatedAt(created.toLocalDateTime());
-	                if (updated != null) item.setUpdatedAt(updated.toLocalDateTime());
-
-	                return item;  // return the found menu item
-	            }
-	        }
+	        ps.setInt(1, id);
+	        return ps.executeUpdate() == 1;
 
 	    } catch (SQLException e) {
 	        e.printStackTrace();
+	        return false;
+	    }
+	}
+
+	
+	public int countProductsForAdmin(String q, String category, String status) {
+	    StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM menu WHERE 1=1");
+	    List<Object> params = new ArrayList<>();
+
+	    if (q != null && !q.isBlank()) {
+	        sql.append(" AND LOWER(name) LIKE ?");
+	        params.add("%" + q.toLowerCase() + "%");
+	    }
+	    if (category != null && !category.isBlank()) {
+	        sql.append(" AND category = ?");
+	        params.add(category);
+	    }
+	    if (status != null && !status.isBlank()) {
+	        sql.append(" AND status = ?");
+	        params.add(status);
 	    }
 
-	    return null;  // if no item found
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+	        for (int i = 0; i < params.size(); i++) {
+	            ps.setObject(i + 1, params.get(i));
+	        }
+
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) return rs.getInt(1);
+	        }
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return 0;
 	}
+
+
+
+
+	
+
+
+
 }
