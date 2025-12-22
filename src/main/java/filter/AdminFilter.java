@@ -15,6 +15,10 @@ import java.io.IOException;
 
 @WebFilter({
         "/dashboard",
+        "/orders",
+        "/products",
+        "/uploads/*",
+        "/users",
         "/admin/*"
 })
 public class AdminFilter implements Filter {
