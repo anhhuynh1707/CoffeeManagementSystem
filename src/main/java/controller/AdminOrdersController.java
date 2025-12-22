@@ -61,12 +61,10 @@ public class AdminOrdersController extends HttpServlet {
             if (status != null && !status.isBlank()) {
                 ok = orderDAO.updateOrderStatus(orderId, status);
             }
-
+        }
 
         // optional: flash message
         session.setAttribute("ordersMsg", ok ? "Updated successfully." : "Update failed.");
-
         response.sendRedirect(request.getContextPath() + "/orders");
-    }
     }
 }
