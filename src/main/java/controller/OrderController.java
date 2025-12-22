@@ -18,27 +18,29 @@ import java.util.List;
 @WebServlet("/checkout")
 public class OrderController extends HttpServlet {
 
-    private CartDAO cartDAO = new CartDAO();
-    private OrderDAO orderDAO = new OrderDAO();
+    private final CartDAO cartDAO = new CartDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
 
-    // STEP 1: Show checkout page
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        HttpSession session = request.getSession();
-        Integer userId = (Integer) session.getAttribute("userId");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
+        Integer userId = (Integer) session.getAttribute("userId");
         List<CartItem> cart = cartDAO.getCartByUser(userId);
 
-        if (cart.isEmpty()) {
-            response.sendRedirect("cart");
+        if (cart == null || cart.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/cart");
             return;
         }
 
         double subtotal = 0;
         int cups = 0;
-
         for (CartItem item : cart) {
             subtotal += item.getFinalPrice() * item.getQuantity();
             cups += item.getQuantity();
@@ -46,20 +48,15 @@ public class OrderController extends HttpServlet {
 
         ShippingService shippingService = new ShippingService();
 
-	    // get address from currentUser (NOT session string)
-	    User currentUser = (User) session.getAttribute("currentUser");
-	    String fullAddress = currentUser != null ? currentUser.getAddress() : null;
-	
-	    String district = AddressUtil.extractDistrict(fullAddress);
-	    String city = "Ho Chi Minh City";
-	
-	    double shipping = shippingService
-	            .calculateShipping(city, district)
-	            .doubleValue();
-	
-	    double total = subtotal + shipping;
+        User currentUser = (User) session.getAttribute("currentUser");
+        String fullAddress = (currentUser != null) ? currentUser.getAddress() : null;
 
-        // Pass data to page
+        String district = AddressUtil.extractDistrict(fullAddress);
+        String city = "Ho Chi Minh City";
+
+        double shipping = shippingService.calculateShipping(city, district).doubleValue();
+        double total = subtotal + shipping;
+
         request.setAttribute("cart", cart);
         request.setAttribute("subtotal", subtotal);
         request.setAttribute("shipping", shipping);
@@ -68,36 +65,37 @@ public class OrderController extends HttpServlet {
 
         try {
             request.getRequestDispatcher("checkout.jsp").forward(request, response);
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            response.sendRedirect(request.getContextPath() + "/cart");
+        }
     }
 
-    // STEP 2: User submits payment
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        HttpSession session = request.getSession();
-        Integer userId = (Integer) session.getAttribute("userId");
-
-        // Get payment method (COD, VietQR, CARD)
-        String paymentMethod = request.getParameter("paymentMethod");
-
-        if (paymentMethod == null || paymentMethod.isEmpty()) {
-            response.sendRedirect("checkout.jsp?error=No payment method selected");
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("userId") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-        // Load cart
-        List<CartItem> cart = cartDAO.getCartByUser(userId);
+        Integer userId = (Integer) session.getAttribute("userId");
 
+        String paymentMethod = request.getParameter("paymentMethod");
+        if (paymentMethod == null || paymentMethod.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/checkout?error=No payment method selected");
+            return;
+        }
+
+        List<CartItem> cart = cartDAO.getCartByUser(userId);
         if (cart == null || cart.isEmpty()) {
-            response.sendRedirect("cart.jsp?error=Your cart is empty");
+            response.sendRedirect(request.getContextPath() + "/cart?error=Your cart is empty");
             return;
         }
 
         double subtotal = 0;
         int cups = 0;
-
         for (CartItem item : cart) {
             subtotal += item.getFinalPrice() * item.getQuantity();
             cups += item.getQuantity();
@@ -105,20 +103,15 @@ public class OrderController extends HttpServlet {
 
         ShippingService shippingService = new ShippingService();
 
-	    // user has only ONE address string
         User currentUser = (User) session.getAttribute("currentUser");
-        String fullAddress = currentUser != null ? currentUser.getAddress() : null;
-	    String district = AddressUtil.extractDistrict(fullAddress);
-		// city fixed for now
-	    String city = "Ho Chi Minh City";
-	
-	    // FINAL shipping fee
-	    double shipping = shippingService
-	            .calculateShipping(city, district)
-	            .doubleValue();
-	    double total = subtotal + shipping;
+        String fullAddress = (currentUser != null) ? currentUser.getAddress() : null;
 
-        // Create new order object
+        String district = AddressUtil.extractDistrict(fullAddress);
+        String city = "Ho Chi Minh City";
+
+        double shipping = shippingService.calculateShipping(city, district).doubleValue();
+        double total = subtotal + shipping;
+
         Order order = new Order();
         order.setUserId(userId);
         order.setSubtotal(subtotal);
@@ -127,54 +120,45 @@ public class OrderController extends HttpServlet {
         order.setTotalCups(cups);
         order.setPaymentMethod(paymentMethod);
 
-        // Determine order + payment status
-        if (paymentMethod.equals("COD")) {
-            order.setStatus("confirmed");
+        // ✅ Correct status logic (admin confirms later)
+        if ("COD".equals(paymentMethod)) {
+            order.setStatus("pending");
             order.setPaymentStatus("unpaid");
         } else {
             order.setStatus("pending");
             order.setPaymentStatus("pending");
         }
 
-        // Save order → returns orderId
         int orderId = orderDAO.saveOrder(order);
-
-        // Move cart → order_items (ONLY HERE)
         orderDAO.moveCartToOrderItems(orderId, cart);
-        
-        // 🔥🔥 ADD THIS BLOCK (SHIPPING SNAPSHOT) 🔥🔥
-        Shipping shippingObj = new Shipping();
-        shippingObj.setOrderId(orderId);
-        shippingObj.setReceiverName(currentUser.getFullName());
-        shippingObj.setPhone(currentUser.getPhone());
-        shippingObj.setAddress(currentUser.getAddress());
-        shippingObj.setCity(city);
-        shippingObj.setDistrict(district);
-        shippingObj.setWard(""); // optional
-        shippingObj.setShippingFee(shipping);
-        shippingObj.setMethod("standard");
-        shippingObj.setStatus("pending");
 
-        ShippingDAO shippingDAO = new ShippingDAO();
-        shippingDAO.createShipping(shippingObj);        
+        // Shipping snapshot only if we have currentUser info
+        if (currentUser != null) {
+            Shipping shippingObj = new Shipping();
+            shippingObj.setOrderId(orderId);
+            shippingObj.setReceiverName(currentUser.getFullName());
+            shippingObj.setPhone(currentUser.getPhone());
+            shippingObj.setAddress(currentUser.getAddress());
+            shippingObj.setCity(city);
+            shippingObj.setDistrict(district);
+            shippingObj.setWard("");
+            shippingObj.setShippingFee(shipping);
+            shippingObj.setMethod("standard");
+            shippingObj.setStatus("pending");
 
-        // REDIRECT BASED ON PAYMENT TYPE
+            ShippingDAO shippingDAO = new ShippingDAO();
+            shippingDAO.createShipping(shippingObj);
+        }
+
         switch (paymentMethod) {
-	        case "COD" -> {
-	            cartDAO.clearCart(userId);
-	            session.setAttribute("cartCount", 0);
-	            response.sendRedirect("payment-result?status=success&orderId=" + orderId);
-	        }
-	        case "VIETQR" -> {
-	            response.sendRedirect("vietqr?orderId=" + orderId);
-	        }
-	        case "CARD" -> {
-	            response.sendRedirect("card-payment.jsp?orderId=" + orderId);
-	        }
-            default -> {
-                // Unexpected method
-                response.sendRedirect("checkout.jsp?error=Invalid payment method");
+            case "COD" -> {
+                cartDAO.clearCart(userId);
+                session.setAttribute("cartCount", 0);
+                response.sendRedirect(request.getContextPath() + "/payment-result?status=success&orderId=" + orderId);
             }
+            case "VIETQR" -> response.sendRedirect(request.getContextPath() + "/vietqr?orderId=" + orderId);
+            case "CARD" -> response.sendRedirect(request.getContextPath() + "/card-payment.jsp?orderId=" + orderId);
+            default -> response.sendRedirect(request.getContextPath() + "/checkout?error=Invalid payment method");
         }
     }
 }

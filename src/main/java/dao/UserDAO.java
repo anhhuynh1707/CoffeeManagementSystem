@@ -333,4 +333,44 @@ public class UserDAO {
             e.printStackTrace();
         }
     }
+    
+    public List<User> getAllUsersForAdmin() {
+        List<User> list = new ArrayList<>();
+
+        String sql = """
+            SELECT id, full_name, email, phone, address, role, status, reset_token, reset_token_expiry
+            FROM users
+            ORDER BY id DESC
+        """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                User u = new User();
+                u.setId(rs.getInt("id"));
+                u.setFullName(rs.getString("full_name"));
+                u.setEmail(rs.getString("email"));
+                u.setPhone(rs.getString("phone"));
+                u.setAddress(rs.getString("address"));
+                u.setRole(rs.getString("role"));
+                u.setStatus(rs.getString("status"));
+                u.setResetToken(rs.getString("reset_token"));
+
+                Timestamp exp = rs.getTimestamp("reset_token_expiry");
+                if (exp != null) {
+                    u.setResetTokenExpiry(exp.toLocalDateTime());
+                }
+
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

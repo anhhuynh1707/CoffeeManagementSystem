@@ -258,15 +258,6 @@
                 </span>
               </td>
 
-              <!-- users.reset_token -->
-              <td class="truncate" title="${u.resetToken}">
-                <c:out value="${empty u.resetToken ? '-' : u.resetToken}" />
-              </td>
-
-              <!-- users.reset_token_expiry -->
-              <td class="truncate" title="${u.resetTokenExpiry}">
-                <c:out value="${empty u.resetTokenExpiry ? '-' : u.resetTokenExpiry}" />
-              </td>
             </tr>
           </c:forEach>
         </tbody>

@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -210,7 +212,9 @@ tr:hover {
 			</div>
 			<div class="stat-card">
 				<h3>Revenue</h3>
-				<div class="stat-number">$${totalRevenue}</div>
+				<div class="stat-number">
+  					<fmt:formatNumber value="${totalRevenue}" groupingUsed="true" maxFractionDigits="0" /> VND
+				</div>
 			</div>
 			<div class="stat-card">
 				<h3>Products</h3>
@@ -244,7 +248,9 @@ tr:hover {
 				<tr>
 					<td>#${o.id}</td>
 					<td>${o.customerName}</td>
-					<td>$${o.totalAmount}</td>
+					<td>
+  						<fmt:formatNumber value="${o.totalAmount}" groupingUsed="true" maxFractionDigits="0" /> VND
+					</td>
 					<td>${o.createdAt}</td>
 
 					<td><span

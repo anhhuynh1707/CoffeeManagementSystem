@@ -1,6 +1,8 @@
 ```jsp
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="vi_VN"/>
 <c:set var="nextDir" value="${sortDir == 'asc' ? 'desc' : 'asc'}" />
 
 <!DOCTYPE html>
@@ -523,7 +525,9 @@
               <div class="muted">${p.description}</div>
             </td>
             <td>${p.category}</td>
-            <td>$${p.price}</td>
+            <td>
+  				<fmt:formatNumber value="${p.price}" groupingUsed="true" maxFractionDigits="0" /> VND
+			</td>
             <td>
               <span class="badge ${p.status == 'available' ? 'available' : 'unavailable'}">
                 ${p.status}
@@ -612,13 +616,13 @@
             </div>
 
             <div class="field">
-              <label>Price ($)</label>
+              <label>Price (VND)</label>
               <input
                 class="input"
                 type="number"
-                step="0.01"
+                step="1"
                 name="price"
-                placeholder="e.g. 5.50"
+                placeholder="e.g. 55000"
               />
             </div>
 
@@ -686,7 +690,7 @@
               </div>
 
               <div class="field">
-                <label>Price ($)</label>
+                <label>Price (VND)</label>
                 <input class="input" type="number" step="0.01" name="price" value="${p.price}" required />
               </div>
 

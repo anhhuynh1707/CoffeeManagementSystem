@@ -233,6 +233,8 @@ public class OrderDAO {
 
         return list;
     }
+    
+    /*
     public int createOrderFromCart(
             int userId,
             List<CartItem> cartItems,
@@ -265,7 +267,7 @@ public class OrderDAO {
             order.setShippingFee(shipping);
             order.setTotalAmount(total);
             order.setTotalCups(totalCups);
-            order.setStatus("CONFIRMED");
+            order.setStatus("confirmed");
             order.setPaymentMethod(paymentMethod);
             order.setPaymentStatus(paymentStatus);
 
@@ -287,12 +289,13 @@ public class OrderDAO {
         }
 
         return orderId;
-    }
+    }*/
+    
     public boolean confirmCardPayment(int orderId) {
 
         String sql = """
             UPDATE orders
-            SET payment_status = 'PAID',
+            SET payment_status = 'paid',
                 status = 'confirmed',
                 updated_at = CURRENT_TIMESTAMP
             WHERE order_id = ?
@@ -330,4 +333,128 @@ public class OrderDAO {
             return false;
         }
     }
+
+
+
+    public boolean markCompleted(int orderId) {
+        String sql = """
+            UPDATE orders
+            SET status = 'completed',
+                payment_status = 'paid'
+            WHERE order_id = ?
+        """;
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean cancelOrder(int orderId) {
+        String sql = """
+                UPDATE orders
+                SET status = 'cancelled',
+                    payment_status = CASE
+                        WHEN payment_status = 'paid' THEN 'refunded'
+                        ELSE 'failed'
+                    END,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE order_id = ?
+            """;
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public List<Order> getAllOrdersForAdmin() {
+        List<Order> list = new ArrayList<>();
+
+        String sql = """
+            SELECT
+                order_id,
+                user_id,
+                subtotal,
+                shipping_fee,
+                total_amount,
+                total_cups,
+                status,
+                payment_method,
+                payment_status
+            FROM orders
+            ORDER BY order_id DESC
+        """;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Order o = new Order();
+                o.setId(rs.getInt("order_id"));
+                o.setUserId(rs.getInt("user_id"));
+                o.setSubtotal(rs.getDouble("subtotal"));
+                o.setShippingFee(rs.getDouble("shipping_fee"));
+                o.setTotalAmount(rs.getDouble("total_amount"));
+                o.setTotalCups(rs.getInt("total_cups"));
+                o.setStatus(rs.getString("status"));
+                o.setPaymentMethod(rs.getString("payment_method"));
+                o.setPaymentStatus(rs.getString("payment_status"));
+                list.add(o);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    
+    
+    public boolean updateOrderStatus(int orderId, String newStatus) {
+        String sql = "UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, newStatus);
+            ps.setInt(2, orderId);
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean markOrderCompletedAndPaid(int orderId) {
+        String sql = """
+            UPDATE orders
+            SET status = 'completed',
+                payment_status = 'paid',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE order_id = ?
+        """;
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, orderId);
+            return ps.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
+
 }

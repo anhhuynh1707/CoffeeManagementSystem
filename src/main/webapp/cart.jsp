@@ -93,7 +93,6 @@
 				<!-- IMAGE -->
 					<img src="${pageContext.request.contextPath}/uploads/menu/${item.imageUrl}" class="cart-img"
 					alt="${item.productName}">
-
 				<div class="item-info">
 					<h3>${item.productName}</h3>
 					<div class="item-price">
